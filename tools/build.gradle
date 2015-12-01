@@ -1,0 +1,69 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'antlr'
+
+apply plugin: 'idea'
+
+generateGrammarSource {
+    arguments += ["-package", "com.giddyplanet.embrace.webidl.parser"]
+}
+
+idea {
+    module {
+        excludeDirs = [file(".gradle")]
+        ["classes", "docs", "dependency-cache", "distributions", "libs", "scripts", "reports", "resources", "test-results", "tmp"].each {
+            excludeDirs << file("$buildDir/$it")
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "build/generated-src/antlr/main"
+        }
+    }
+}
+
+task otherStartScripts(type: CreateStartScripts) {
+    description "Creates OS specific scripts to call the 'other' entry point"
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+    mainClassName = 'com.giddyplanet.embrace.tools.WebIdlToJava'
+    applicationName = 'idl2java'
+}
+
+mainClassName = "com.giddyplanet.embrace.tools.ExtractWebIdlFragments"
+applicationName = 'extract'
+
+distZip {
+    baseName = 'embrace-tools'; //archivesBaseName
+//    classifier = 'app'
+    //include our extra start script
+    //this is a bit weird, I'm open to suggestions on how to do this better
+    applicationDistribution.from(otherStartScripts) {
+        into 'bin'
+        fileMode = 0755
+        duplicatesStrategy = 'exclude'
+    }
+}
+
+run {
+    if ( project.hasProperty("appArgs") ) {
+        args Eval.me(appArgs)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    antlr 'org.antlr:antlr4:4.5'
+
+    compile 'com.lexicalscope.jewelcli:jewelcli:0.8.9'
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'org.antlr:antlr4-runtime:4.5'
+
+    testCompile 'junit:junit:4.12'
+}
