@@ -189,6 +189,24 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     }
 
     @Override
+    public void enterConst_(WebIDLParser.Const_Context ctx) {
+        super.enterConst_(ctx);
+
+        WebIDLParser.ConstTypeContext typeCtx = ctx.constType();
+        if (typeCtx.primitiveType() != null) {
+            String type = typeCtx.primitiveType().getText();
+            String name = ctx.IDENTIFIER_WEBIDL().getText();
+            String value = ctx.constValue().getText();
+            Constant constant = new Constant(type, name, value);
+            if (currentType != null) {
+                currentType.addConstant(constant);
+            }
+        } else {
+            // todo: identifier
+        }
+    }
+
+    @Override
     public void exitOperation(WebIDLParser.OperationContext ctx) {
         if (currentMethod != null && currentType != null) {
             currentType.addOperation((Operation) currentMethod);

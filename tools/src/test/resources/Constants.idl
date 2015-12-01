@@ -1,0 +1,6 @@
+interface Constants {
+  const boolean DEBUG = false;
+//  const octet LF = 10;
+  const unsigned long BIT_MASK = 0x0000fc00;
+  const float AVOGADRO = 6.022e23;
+};

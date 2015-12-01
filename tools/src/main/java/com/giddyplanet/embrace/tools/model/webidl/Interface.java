@@ -12,6 +12,7 @@ public class Interface implements Definition {
     LinkedHashSet<Attribute> attributes = new LinkedHashSet<>();
     Interface superType;
     LinkedHashSet<Interface> interfaces = new LinkedHashSet<>();
+    LinkedHashSet<Constant> constants = new LinkedHashSet<>();
 
     public Interface(String name) {
         this.name = name;
@@ -63,6 +64,14 @@ public class Interface implements Definition {
 
     public LinkedHashSet<Attribute> getAttributes() {
         return attributes;
+    }
+
+    public void addConstant(Constant constant) {
+        constants.add(constant);
+    }
+
+    public LinkedHashSet<Constant> getConstants() {
+        return constants;
     }
 
     public boolean hasConstructors() {

@@ -3,7 +3,6 @@ package com.giddyplanet.embrace.tools;
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
 import com.giddyplanet.embrace.tools.model.webidl.Interface;
-import com.giddyplanet.embrace.tools.webidl2java.Generator;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +10,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,11 +40,10 @@ public class TranspilerTest {
 
     @Test
     public void transpile() throws IOException {
-        String idl = new String(Files.readAllBytes(idlPath), "UTF-8");
         Path javaPath = getJavaPath(idlPath);
         String expectedJava = new String(Files.readAllBytes(javaPath), "UTF-8");
         ModelBuildingListener listener = new ModelBuildingListener();
-        Generator.transpile(idl, listener);
+        WebIdlToJava.transpile(listener, new FileReader(idlPath.toFile()));
 
         JavaWriter writer = new JavaWriter(null, null);
         StringBuilder sb = new StringBuilder();

@@ -11,6 +11,7 @@ import java.io.*;
 
 /**
  * Takes a HTML file as input and outputs a file containing all detected WebIDL fragments.
+ * It assumes that fragments are represented as <code>pre</code> elements with the <code>idl</code> style class but not the <code>extract</code> style class
  */
 public class ExtractWebIdlFragments {
 
@@ -18,7 +19,7 @@ public class ExtractWebIdlFragments {
         @Option(description = "HTML file containing WebIDL fragments")
         File getIn();
 
-        @Option(description = "Write WebIDL fragments to this file. If not specified output will be printed to console",
+        @Option(description = "Write WebIDL fragments to this file. If not specified then output will be printed to console",
                 defaultToNull = true)
         File getOut();
     }
@@ -44,8 +45,6 @@ public class ExtractWebIdlFragments {
         Document doc = Jsoup.parse(inFile, "UTF-8");
         Elements fragments = doc.select("pre.idl:not(.extract)");
         for (Element fragment : fragments) {
-            if (!fragment.hasClass("idl")) continue;;
-            if (fragment.hasClass("extract")) continue;
             String idl = fragment.text();
             writer.append(idl);
             writer.append("\n");

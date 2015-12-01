@@ -26,6 +26,8 @@ public class JavaWriter {
         this.javaPackage = javaPackage;
         if (srcFolder != null && javaPackage != null) {
             packageFolder = getPackagePath(srcFolder, javaPackage);
+        } else {
+            packageFolder = srcFolder;
         }
     }
 
@@ -116,8 +118,8 @@ public class JavaWriter {
         StringBuilder sb = new StringBuilder();
         if (javaPackage != null) {
             sb.append("package ").append(javaPackage).append(";\n");
+            sb.append("\n");
         }
-        sb.append("\n");
         sb.append("import jsinterop.annotations.JsPackage;\n");
         sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("import jsinterop.annotations.JsProperty;\n");
@@ -172,6 +174,17 @@ public class JavaWriter {
         }
 
         sb.append(" {\n");
+
+        for (Constant constant : type.getConstants()) {
+            sb.append(INDENT);
+            sb.append("public final static ");
+            sb.append(fixType(constant.getType()));
+            sb.append(" ");
+            sb.append(constant.getName());
+            sb.append(" = ");
+            sb.append(constant.getValue());
+            sb.append(";\n");
+        }
 
         HashSet<Interface> interfaces = new HashSet<>();
         collectInterfaces(type, interfaces);
