@@ -68,14 +68,14 @@ public class WebIdlToJava {
 
         if (idlFiles != null) {
             for (File idlFile : idlFiles) {
-                handleFile(listener, idlFile);
+                transpileFile(listener, idlFile, FileType.AUTO);
             }
         }
 
         if (idlFolder != null) {
             File[] files = idlFolder.listFiles();
             for (File file : files) {
-                handleFile(listener, file);
+                transpileFile(listener, file, FileType.AUTO);
             }
         }
 
@@ -85,10 +85,10 @@ public class WebIdlToJava {
         }
     }
 
-    private static void handleFile(ModelBuildingListener listener, File idlFile) throws IOException {
-        if (idlFile.getName().endsWith(".html")) {
+    public static void transpileFile(ModelBuildingListener listener, File idlFile, FileType type) throws IOException {
+        if ((type == FileType.AUTO && idlFile.getName().endsWith(".html")) || type == FileType.HTML) {
             handleIdlFragments(listener, idlFile);
-        } else if (idlFile.getName().endsWith(".idl")) {
+        } else if ((type == FileType.AUTO && idlFile.getName().endsWith(".idl")) || type == FileType.WEBIDL) {
             handleIdlFile(listener, idlFile);
         }
     }
@@ -97,12 +97,13 @@ public class WebIdlToJava {
         transpile(listener, new FileReader(idlFile));
     }
 
-    private static void handleIdlFragments(ModelBuildingListener listener, File htmlFile) throws IOException {
+    public static void handleIdlFragments(ModelBuildingListener listener, File htmlFile) throws IOException {
         Document doc = Jsoup.parse(htmlFile, "UTF-8");
         Elements fragments = doc.select("pre.idl:not(.extract)");
         for (Element fragment : fragments) {
             String idl = fragment.text();
-            transpile(listener, new StringReader(idl));
+            StringReader reader = new StringReader(idl);
+            transpile(listener, reader);
         }
     }
 

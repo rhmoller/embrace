@@ -1,0 +1,5 @@
+rootProject.name = 'embrace'
+
+include 'tools'
+include 'webapis'
+include 'examples'
