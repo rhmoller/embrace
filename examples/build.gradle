@@ -1,7 +1,24 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/google-snapshots"
+    }
+}
+
 dependencies {
-    compile project(':webapis')
-    compile name: 'gwt-user'
+    compile files("${projectDir}/../webapis/build/libs/webapis.jar")
+
+    compile "com.google.gwt:gwt-user:2.8.0-SNAPSHOT"
+    compile "com.google.gwt:gwt-dev:2.8.0-SNAPSHOT"
+    compile "com.google.gwt:gwt-codeserver:2.8.0-SNAPSHOT"
+}
+
+task run(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    classpath += files("${projectDir}/src/main/java")
+    classpath += files("${projectDir}/../webapis/build/libs/webapis.jar")
+    main = "com.google.gwt.dev.DevMode"
+    args "com.giddyplanet.embrace.examples.Examples"
 }
