@@ -7,6 +7,29 @@ repositories {
     }
 }
 
+sourceSets {
+    generated {
+        java {
+            srcDir 'build/generated-src/java/main/'
+        }
+    }
+}
+
+dependencies {
+    generatedCompile project(":")
+    generatedCompile "com.google.gwt:gwt-user:2.8.0-SNAPSHOT"
+}
+
+idea {
+    module {
+        excludeDirs = [file(".gradle")]
+        ["classes", "docs", "dependency-cache", "distributions", "libs", "scripts", "reports", "resources", "test-results", "tmp"].each {
+            excludeDirs << file("$buildDir/$it")
+        }
+    }
+}
+
+
 dependencies {
     compile project(':tools')
     compile "com.google.gwt:gwt-user:2.8.0-SNAPSHOT"
@@ -15,4 +38,9 @@ dependencies {
 task idl2java(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "com.giddyplanet.embrace.webapis.internal.Generator"
+}
+
+jar {
+    from sourceSets.generated.output
+    dependsOn idl2java
 }

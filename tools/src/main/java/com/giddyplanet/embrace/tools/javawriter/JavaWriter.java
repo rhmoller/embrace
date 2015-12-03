@@ -244,6 +244,12 @@ public class JavaWriter {
             }
             String returnType = operation.getReturnType();
             returnType = fixType(returnType);
+
+            // todo HACK: Element? HTMLCollection.namedItem(DOMString name) conflict with (RadioNodeList or Element)? HTMLFormControlsCollection.namedItem(DOMString name)
+            if ("HTMLCollection".equals(type.getName()) && "namedItem".equals(operation.getName())) {
+                returnType = "Object";
+            }
+
             sb.append(returnType);
             sb.append(" ");
             sb.append(operation.getName());

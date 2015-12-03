@@ -28,6 +28,7 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     public void enterInterface_(WebIDLParser.Interface_Context ctx) {
         super.enterInterface_(ctx);
         String name = ctx.IDENTIFIER_WEBIDL().toString();
+        System.out.println("Entering interface " + name);
         currentType = model.getOrCreateInterface(name);
         // todo: iterate over extended attributes and detect all constructors (with args)
         boolean hasConstructor = typeExtendedAttributes.contains("Constructor");
