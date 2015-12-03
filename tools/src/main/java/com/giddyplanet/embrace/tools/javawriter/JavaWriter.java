@@ -118,9 +118,10 @@ public class JavaWriter {
             sb.append("\n");
         }
         sb.append("import jsinterop.annotations.JsIgnore;\n");
+        sb.append("import jsinterop.annotations.JsOverlay;\n");
         sb.append("import jsinterop.annotations.JsPackage;\n");
-        sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("import jsinterop.annotations.JsProperty;\n");
+        sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("\n");
 
         sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
@@ -173,16 +174,17 @@ public class JavaWriter {
 
         sb.append(" {\n");
 
-//        for (Constant constant : type.getConstants()) {
-//            sb.append(INDENT);
-//            sb.append("public static final ");
-//            sb.append(fixType(constant.getType()));
-//            sb.append(" ");
-//            sb.append(constant.getName());
-//            sb.append(" = ");
-//            sb.append(constant.getValue());
-//            sb.append(";\n");
-//        }
+        for (Constant constant : type.getConstants()) {
+            sb.append(INDENT);
+            sb.append("@JsOverlay ");
+            sb.append("public static final ");
+            sb.append(fixType(constant.getType()));
+            sb.append(" ");
+            sb.append(constant.getName());
+            sb.append(" = ");
+            sb.append(constant.getValue());
+            sb.append(";\n");
+        }
 
         HashSet<Interface> interfaces = new HashSet<>();
         collectInterfaces(type, interfaces);

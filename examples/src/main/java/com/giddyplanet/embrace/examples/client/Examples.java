@@ -1,9 +1,6 @@
 package com.giddyplanet.embrace.examples.client;
 
-import com.giddyplanet.embrace.webapis.CanvasRenderingContext2D;
-import com.giddyplanet.embrace.webapis.Document;
-import com.giddyplanet.embrace.webapis.HTMLCanvasElement;
-import com.giddyplanet.embrace.webapis.Window;
+import com.giddyplanet.embrace.webapis.*;
 import com.google.gwt.core.client.EntryPoint;
 
 public class Examples implements EntryPoint {
@@ -34,12 +31,17 @@ public class Examples implements EntryPoint {
         ctx.arc(200, 150, 80, 0, Math.PI, false);
         ctx.stroke();
 
+        ctx.save();
         ctx.scale(1, 1.5);
         ctx.beginPath();
         ctx.arc(170, 90, 20, 0, 2.0 * Math.PI, false);
         ctx.moveTo(250, 100);
         ctx.arc(230, 90, 20, 0, 2.0 * Math.PI, false);
         ctx.fill();
+        ctx.restore();
+
+        ctx.setFillStyle("#fff");
+        ctx.fillText("Canvas is an element node: " + (canvas.getNodeType() == Node.ELEMENT_NODE), 10, 20);
 
         doc.getBody().appendChild(canvas);
     }
