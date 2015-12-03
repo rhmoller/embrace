@@ -1,6 +1,10 @@
 .gradle/
 build
 tools/out
+examples/gwt-unitCache
+examples/war
+gwt-unitCache
+out
 *.iml
 *.ipr
 *.iws
