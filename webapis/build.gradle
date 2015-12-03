@@ -36,11 +36,15 @@ dependencies {
 }
 
 task idl2java(type: JavaExec) {
+    outputs.files sourceSets.generated.output
     classpath = sourceSets.main.runtimeClasspath
     main = "com.giddyplanet.embrace.webapis.internal.Generator"
 }
 
+compileGeneratedJava.dependsOn idl2java
+
 jar {
     from sourceSets.generated.output
-    dependsOn idl2java
+    from sourceSets.generated.allSource
+    exclude "**/webapis/internal"
 }
