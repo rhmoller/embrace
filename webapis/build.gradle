@@ -22,10 +22,13 @@ dependencies {
 
 idea {
     module {
-        excludeDirs = [file(".gradle")]
+        excludeDirs = []
+
         ["classes", "docs", "dependency-cache", "distributions", "libs", "scripts", "reports", "resources", "test-results", "tmp"].each {
             excludeDirs << file("$buildDir/$it")
         }
+
+        generatedSourceDirs += file("${buildDir}/generated-src/java/main")
     }
 }
 
