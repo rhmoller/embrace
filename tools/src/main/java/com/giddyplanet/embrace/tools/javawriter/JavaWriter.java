@@ -1,16 +1,13 @@
 package com.giddyplanet.embrace.tools.javawriter;
 
 import com.giddyplanet.embrace.tools.model.webidl.*;
+import com.giddyplanet.embrace.tools.model.webidl.Enumeration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // todo: another step should build a Java model from the Web IDL model
 // todo: this class should only do a dumb serialization of this Java model
@@ -120,6 +117,7 @@ public class JavaWriter {
             sb.append("package ").append(javaPackage).append(";\n");
             sb.append("\n");
         }
+        sb.append("import jsinterop.annotations.JsIgnore;\n");
         sb.append("import jsinterop.annotations.JsPackage;\n");
         sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("import jsinterop.annotations.JsProperty;\n");
@@ -175,16 +173,16 @@ public class JavaWriter {
 
         sb.append(" {\n");
 
-        for (Constant constant : type.getConstants()) {
-            sb.append(INDENT);
-            sb.append("public final static ");
-            sb.append(fixType(constant.getType()));
-            sb.append(" ");
-            sb.append(constant.getName());
-            sb.append(" = ");
-            sb.append(constant.getValue());
-            sb.append(";\n");
-        }
+//        for (Constant constant : type.getConstants()) {
+//            sb.append(INDENT);
+//            sb.append("public static final ");
+//            sb.append(fixType(constant.getType()));
+//            sb.append(" ");
+//            sb.append(constant.getName());
+//            sb.append(" = ");
+//            sb.append(constant.getValue());
+//            sb.append(";\n");
+//        }
 
         HashSet<Interface> interfaces = new HashSet<>();
         collectInterfaces(type, interfaces);
@@ -268,6 +266,47 @@ public class JavaWriter {
                 }
             }
             sb.append(");\n");
+
+            List<Argument> arguments = operation.getArguments();
+            if (!arguments.isEmpty()) {
+                Argument last = arguments.get(arguments.size() - 1);
+                if (last.isOptional()) {
+
+
+                    sb.append(INDENT);
+                    if (!isInterface) {
+                        sb.append("public native ");
+                    }
+                    returnType = operation.getReturnType();
+                    returnType = fixType(returnType);
+
+                    // todo HACK: Element? HTMLCollection.namedItem(DOMString name) conflict with (RadioNodeList or Element)? HTMLFormControlsCollection.namedItem(DOMString name)
+                    if ("HTMLCollection".equals(type.getName()) && "namedItem".equals(operation.getName())) {
+                        returnType = "Object";
+                    }
+
+                    sb.append(returnType);
+                    sb.append(" ");
+                    sb.append(operation.getName());
+                    sb.append("(");
+                    //noinspection Duplicates
+                    for (int i = 0; i < arguments.size(); i++) {
+                        Argument argument = arguments.get(i);
+                        if (argument.isOptional()) break;
+                        sb.append(fixType(argument.getType()));
+                        if (argument.isVarArgs()) {
+                            sb.append("...");
+                        }
+                        sb.append(" ");
+                        sb.append(fixName(argument.getName()));
+                        if (i < arguments.size() -1 && !arguments.get(i + 1).isOptional()) {
+                            sb.append(", ");
+                        }
+                    }
+                    sb.append(");\n");
+
+                }
+            }
         }
 
 
@@ -339,6 +378,49 @@ public class JavaWriter {
                         }
                     }
                     sb.append(");\n");
+
+
+                    List<Argument> arguments = operation.getArguments();
+                    if (!arguments.isEmpty()) {
+                        Argument last = arguments.get(arguments.size() - 1);
+                        if (last.isOptional()) {
+
+
+                            sb.append(INDENT);
+                            if (!isInterface) {
+                                sb.append("public native ");
+                            }
+                            returnType = operation.getReturnType();
+                            returnType = fixType(returnType);
+
+                            // todo HACK: Element? HTMLCollection.namedItem(DOMString name) conflict with (RadioNodeList or Element)? HTMLFormControlsCollection.namedItem(DOMString name)
+                            if ("HTMLCollection".equals(type.getName()) && "namedItem".equals(operation.getName())) {
+                                returnType = "Object";
+                            }
+
+                            sb.append(returnType);
+                            sb.append(" ");
+                            sb.append(operation.getName());
+                            sb.append("(");
+                            //noinspection Duplicates
+                            for (int i = 0; i < arguments.size(); i++) {
+                                Argument argument = arguments.get(i);
+                                if (argument.isOptional()) break;
+                                sb.append(fixType(argument.getType()));
+                                if (argument.isVarArgs()) {
+                                    sb.append("...");
+                                }
+                                sb.append(" ");
+                                sb.append(fixName(argument.getName()));
+                                if (i < arguments.size() -1 && !arguments.get(i + 1).isOptional()) {
+                                    sb.append(", ");
+                                }
+                            }
+                            sb.append(");\n");
+
+                        }
+                    }
+
                 }
             }
         }

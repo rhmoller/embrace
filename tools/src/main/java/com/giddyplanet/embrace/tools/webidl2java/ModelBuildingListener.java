@@ -186,6 +186,10 @@ public class ModelBuildingListener extends WebIDLBaseListener {
             if (ctx.ellipsis() != null && "...".equals(ctx.ellipsis().getText())) {
                 arg.setVarArgs(true);
             }
+            if (ctx.ellipsis() == null) {
+                System.out.println("optional: " + ctx.toString());
+                arg.setOptional(true);
+            }
         }
     }
 

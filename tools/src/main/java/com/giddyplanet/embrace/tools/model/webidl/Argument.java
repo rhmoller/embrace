@@ -4,6 +4,7 @@ public class Argument {
     private String type;
     private String name;
     private boolean varArgs = false;
+    private boolean optional;
 
     public Argument(String type, String name) {
         this.type = type;
@@ -43,5 +44,13 @@ public class Argument {
 
     public boolean isVarArgs() {
         return varArgs;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
     }
 }
