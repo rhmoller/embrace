@@ -50,7 +50,7 @@ distZip {
 
 run {
     if ( project.hasProperty("appArgs") ) {
-        args Eval.me(appArgs)
+        args appArgs; //Eval.me(appArgs)
     }
 }
 

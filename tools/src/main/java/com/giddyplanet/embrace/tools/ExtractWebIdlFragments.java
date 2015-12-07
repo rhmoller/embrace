@@ -43,7 +43,7 @@ public class ExtractWebIdlFragments {
         }
 
         Document doc = Jsoup.parse(inFile, "UTF-8");
-        Elements fragments = doc.select("pre.idl:not(.extract)");
+        Elements fragments = doc.select("pre.idl:not(.extract),pre.extraidl");
         for (Element fragment : fragments) {
             String idl = fragment.text();
             writer.append(idl);

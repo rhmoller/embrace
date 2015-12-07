@@ -99,7 +99,7 @@ public class WebIdlToJava {
 
     public static void handleIdlFragments(ModelBuildingListener listener, File htmlFile) throws IOException {
         Document doc = Jsoup.parse(htmlFile, "UTF-8");
-        Elements fragments = doc.select("pre.idl:not(.extract)");
+        Elements fragments = doc.select("pre.idl:not(.extract),pre.extraidl");
         for (Element fragment : fragments) {
             String idl = fragment.text();
             StringReader reader = new StringReader(idl);

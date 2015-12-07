@@ -48,6 +48,7 @@ public class JavaWriter {
         } else if (type instanceof Enumeration) {
             Enumeration e = (Enumeration) type;
             String src = createSource(e);
+            System.out.println("Writing enum " + src);
             File srcFile = new File(packageFolder, e.getName() + ".java");
             Files.write(srcFile.toPath(), src.getBytes("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         } else if (type instanceof Callback) {
@@ -65,16 +66,39 @@ public class JavaWriter {
             sb.append("public enum " + e.getName() + " {\n");
             for (Iterator<String> iterator = e.getValues().iterator(); iterator.hasNext(); ) {
                 String s = iterator.next();
-                sb.append("    ");
-                sb.append(s);
+                sb.append(INDENT);
+                sb.append(makeIdentifier(s)).append("(\"").append(s).append("\")");
                 if (iterator.hasNext()) {
-                    sb.append(", ");
+                    sb.append(",\n");
+                } else {
+                    sb.append(";\n");
                 }
-                sb.append("\n");
             }
+            sb.append(INDENT).append("private final String text;\n");
+            sb.append(INDENT).append("private ").append(e.getName()).append("(String text) {\n");
+            sb.append(INDENT).append(INDENT).append("this.text = text;\n");
+            sb.append(INDENT).append("}\n");
+            sb.append(INDENT).append("public String toString() {\n");
+            sb.append(INDENT).append(INDENT).append("return text;\n");
+            sb.append(INDENT).append("}\n");
             sb.append("}\n");
         }
 
+        return sb.toString();
+    }
+
+    private String makeIdentifier(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (i == 0 && Character.isJavaIdentifierStart(c)) {
+                sb.append(c);
+            } else if (Character.isJavaIdentifierPart(c)) {
+                sb.append(c);
+            } else {
+                sb.append("_");
+            }
+        }
         return sb.toString();
     }
 

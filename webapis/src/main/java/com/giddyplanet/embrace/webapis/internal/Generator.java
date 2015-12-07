@@ -25,9 +25,12 @@ public class Generator {
         Trust.trustAllCertificates();
 
         ModelBuildingListener listener = new ModelBuildingListener();
+        addSpec(listener, new File("data/dom.html"));
+        addSpec(listener, new File("data/serialization.html"));
         addSpec(listener, new File("data/whatwg.html"));
+        addSpec(listener, new File("data/cssom.html"));
 //        addSpec(listener, new URL("https://html.spec.whatwg.org/"));
-        addSpec(listener, new URL("https://dom.spec.whatwg.org/"));
+//        addSpec(listener, new URL("https://dom.spec.whatwg.org/"));
 
         File srcFolder = new File("build/generated-src/java/main");
         srcFolder.mkdirs();
@@ -40,7 +43,7 @@ public class Generator {
 
     private static void addSpec(ModelBuildingListener listener, URL url) throws IOException {
         Document doc = Jsoup.parse(url, 300000);
-        Elements fragments = doc.select("pre.idl");
+        Elements fragments = doc.select("pre.idl,pre.extraidl");
         for (Element fragment : fragments) {
             if (fragment.hasClass("extract")) continue;
             String idl = fragment.text();
@@ -51,7 +54,7 @@ public class Generator {
 
     private static void addSpec(ModelBuildingListener listener, File file) throws IOException {
         Document doc = Jsoup.parse(file, "UTF-8");
-        Elements fragments = doc.select("pre.idl");
+        Elements fragments = doc.select("pre.idl,pre.extraidl");
         for (Element fragment : fragments) {
             if (fragment.hasClass("extract")) continue;
             String idl = fragment.text();
