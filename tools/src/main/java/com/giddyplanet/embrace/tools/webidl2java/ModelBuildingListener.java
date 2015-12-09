@@ -15,6 +15,7 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     HasArguments currentMethod = null;
     Enumeration currentEnum = null;
     Set<String> unionMembers = new HashSet<>();
+    private boolean callbackInterface = false;
 
     @Override
     public void enterOther(WebIDLParser.OtherContext ctx) {
@@ -29,11 +30,9 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         super.enterInterface_(ctx);
         String name = ctx.IDENTIFIER_WEBIDL().toString();
         currentType = model.getOrCreateInterface(name);
+        currentType.setCallback(callbackInterface);
         // todo: iterate over extended attributes and detect all constructors (with args)
-        boolean hasConstructor = typeExtendedAttributes.contains("Constructor");
-        if (hasConstructor) {
-            currentType.addConstructor(new Operation("<init>>"));
-        }
+        currentType.getExtendedAttributes().addAll(typeExtendedAttributes);
         if (ctx.inheritance() != null && ctx.inheritance().IDENTIFIER_WEBIDL() != null) {
             String superTypeName = ctx.inheritance().IDENTIFIER_WEBIDL().getText();
             Interface superType = model.getOrCreateInterface(superTypeName);
@@ -54,6 +53,7 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         String name = ctx.IDENTIFIER_WEBIDL().toString();
         currentType = model.getOrCreateInterface(name);
         // todo: iterate over extended attributes and detect all constructors (with args)
+        currentType.getExtendedAttributes().addAll(typeExtendedAttributes);
         boolean hasConstructor = typeExtendedAttributes.contains("Constructor");
         if (hasConstructor) {
             currentType.addConstructor(new Operation("<init>>"));
@@ -133,6 +133,11 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     }
 
     @Override
+    public void enterCallbackRestOrInterface(WebIDLParser.CallbackRestOrInterfaceContext ctx) {
+        callbackInterface = true;
+    }
+
+    @Override
     public void enterCallbackRest(WebIDLParser.CallbackRestContext ctx) {
         String name = ctx.IDENTIFIER_WEBIDL().getText();
 
@@ -154,8 +159,9 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     }
 
     @Override
-    public void exitCallbackRest(WebIDLParser.CallbackRestContext ctx) {
+    public void exitCallbackOrInterface(WebIDLParser.CallbackOrInterfaceContext ctx) {
         currentMethod = null;
+        callbackInterface = false;
     }
 
     @Override

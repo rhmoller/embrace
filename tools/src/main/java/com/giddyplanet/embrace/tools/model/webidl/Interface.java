@@ -1,8 +1,6 @@
 package com.giddyplanet.embrace.tools.model.webidl;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 public class Interface implements Definition {
     boolean resolved;
@@ -13,6 +11,8 @@ public class Interface implements Definition {
     Interface superType;
     LinkedHashSet<Interface> interfaces = new LinkedHashSet<>();
     LinkedHashSet<Constant> constants = new LinkedHashSet<>();
+    private Set<String> extendedAttributes = new HashSet<>();
+    private boolean callback;
 
     public Interface(String name) {
         this.name = name;
@@ -113,5 +113,24 @@ public class Interface implements Definition {
         result = 31 * result + (superType != null ? superType.hashCode() : 0);
         result = 31 * result + interfaces.hashCode();
         return result;
+    }
+
+    public void setExtendedAttributes(Set<String> extendedAttributes) {
+        this.extendedAttributes = extendedAttributes;
+    }
+
+    public Set<String> getExtendedAttributes() {
+        return extendedAttributes;
+    }
+
+    public void setCallback(boolean callback) {
+        this.callback = callback;
+        if (this.callback) {
+            extendedAttributes.add("MarkedAsCallback");
+        }
+    }
+
+    public boolean isCallback() {
+        return callback;
     }
 }

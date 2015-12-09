@@ -4,6 +4,12 @@ apply plugin: 'antlr'
 
 apply plugin: 'idea'
 
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/google-snapshots"
+    }
+}
+
 generateGrammarSource {
     arguments += ["-package", "com.giddyplanet.embrace.webidl.parser"]
 }
@@ -57,9 +63,12 @@ run {
 dependencies {
     antlr 'org.antlr:antlr4:4.5'
 
+    compile "com.google.gwt:gwt-user:2.8.0-SNAPSHOT"
+
     compile 'com.lexicalscope.jewelcli:jewelcli:0.8.9'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'org.antlr:antlr4-runtime:4.5'
+    compile 'com.squareup:javapoet:1.4.0'
 
     testCompile 'junit:junit:4.12'
 }
