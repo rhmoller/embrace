@@ -313,21 +313,21 @@ public class JavaWriter {
         }
     }
 
-    private String fixType(String returnType) {
-        if (returnType.endsWith("?")) {
-            returnType = returnType.substring(0, returnType.length() - 1);
+    private String fixType(String type) {
+        if (type.endsWith("?")) {
+            type = type.substring(0, type.length() - 1);
         }
 
-        if (returnType.startsWith("sequence<")) {
-            returnType = box(fixType(returnType.substring(9, returnType.length() - 1))) + "[]";
+        if (type.startsWith("sequence<")) {
+            type = box(fixType(type.substring(9, type.length() - 1))) + "[]";
 //            returnType = "java.util.ArrayList<" + box(fixType(returnType.substring(9, returnType.length() - 1))) + ">";
         }
 
-        if (returnType.startsWith("Promise<")) {
+        if (type.startsWith("Promise<")) {
             return "Object";
         }
 
-        switch (returnType) {
+        switch (type) {
             case "DOMString":
             case "USVString":
             case "ByteString":
@@ -383,7 +383,7 @@ public class JavaWriter {
                 return "Object";
         }
 
-        return returnType;
+        return type;
     }
 
     private String box(String type) {
