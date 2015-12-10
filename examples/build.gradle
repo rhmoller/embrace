@@ -32,5 +32,6 @@ task gwtc(type: JavaExec) {
     classpath += files("${projectDir}/src/main/java")
     classpath += files("${projectDir}/../webapis/build/libs/webapis.jar")
     main = "com.google.gwt.dev.Compiler"
-    args "-style DETAILED -saveSource -compileReport -gen build/gen -workDir build/work -extra build/extra com.giddyplanet.embrace.examples.Examples".split().toList()
+    args "-saveSource -compileReport -gen build/gen -workDir build/work -extra build/extra com.giddyplanet.embrace.examples.Examples".split().toList()
+//    args "-style DETAILED -saveSource -compileReport -gen build/gen -workDir build/work -extra build/extra com.giddyplanet.embrace.examples.Examples".split().toList()
 }

@@ -51,11 +51,15 @@ public class Examples implements EntryPoint {
 
         HTMLButtonElement button = (HTMLButtonElement) doc.createElement("button");
         button.innerHTML = "Click Me";
-        button.addEventListener("click", e -> {
-            getWindow().alert("Clicked!");
-        }, false);
 
+        Window window = getWindow();
+
+        button.addEventListener("click", e -> {
+            window.alert("Clicked!");
+        }, false);
         body.appendChild(button);
+
+        getWindow().setTimeout((MyFunction)args -> window.alert("Hello " + args[0]), 1000, "World");
     }
 
     public static native Document getDocument() /*-{
