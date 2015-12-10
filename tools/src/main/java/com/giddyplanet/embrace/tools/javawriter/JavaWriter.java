@@ -304,6 +304,7 @@ public class JavaWriter {
 
     private String fixType(String type) {
         if (type.endsWith("?")) {
+            // todo: nullable primitives should be boxed
             type = type.substring(0, type.length() - 1);
         }
 
@@ -329,11 +330,6 @@ public class JavaWriter {
             case "ByteString":
                 return "String";
 
-            case "any":
-                return "Object";
-            case "object":
-                return "Object";
-
             case "unsignedshort":
                 return "short";
             case "long":
@@ -350,13 +346,13 @@ public class JavaWriter {
             case "Elements":
                 return "Element[]";
 
+            case "any":
+            case "object":
+
             case "Uint8ClampedArray":
-
             case "EventHandler":
-
             case "OnErrorEventHandler":
             case "OnBeforeUnloadEventHandler":
-
             case "FileList":
             case "MediaProvider":
             case "MediaStream":
