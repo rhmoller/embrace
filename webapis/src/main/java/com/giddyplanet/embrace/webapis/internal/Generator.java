@@ -3,6 +3,7 @@ package com.giddyplanet.embrace.webapis.internal;
 import com.giddyplanet.embrace.tools.WebIdlToJava;
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
+import com.giddyplanet.embrace.tools.model.webidl.SimpleTypeResolver;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +36,7 @@ public class Generator {
         File srcFolder = new File("build/generated-src/java/main");
         srcFolder.mkdirs();
 
-        JavaWriter writer = new JavaWriter(srcFolder, "com.giddyplanet.embrace.webapis");
+        JavaWriter writer = new JavaWriter(srcFolder, "com.giddyplanet.embrace.webapis", new SimpleTypeResolver(listener.getModel()));
         for (Definition definition : listener.getModel().getTypes().values()) {
             writer.createSourceFile(definition);
         }

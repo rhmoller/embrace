@@ -2,6 +2,7 @@ package com.giddyplanet.embrace.tools;
 
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
+import com.giddyplanet.embrace.tools.model.webidl.SimpleTypeResolver;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
 import com.giddyplanet.embrace.webidl.parser.WebIDLLexer;
 import com.giddyplanet.embrace.webidl.parser.WebIDLParser;
@@ -79,7 +80,7 @@ public class WebIdlToJava {
             }
         }
 
-        JavaWriter writer = new JavaWriter(outDir, javaPackage);
+        JavaWriter writer = new JavaWriter(outDir, javaPackage, new SimpleTypeResolver(listener.getModel()));
         for (Definition definition : listener.getModel().getTypes().values()) {
             writer.createSourceFile(definition);
         }

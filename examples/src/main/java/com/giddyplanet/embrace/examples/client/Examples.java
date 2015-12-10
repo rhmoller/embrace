@@ -18,7 +18,7 @@ public class Examples implements EntryPoint {
         ctx.fillStyle = "#008";
         ctx.fillRect(0, 0, 400, 300);
 
-        ctx.imageSmoothingQuality = ImageSmoothingQuality.medium;
+        ctx.imageSmoothingQuality = ImageSmoothingQuality.HIGH;
 
         ctx.fillStyle = "#ff0";
         ctx.beginPath();

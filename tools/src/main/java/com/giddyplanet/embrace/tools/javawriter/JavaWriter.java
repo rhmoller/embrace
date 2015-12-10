@@ -1,5 +1,6 @@
 package com.giddyplanet.embrace.tools.javawriter;
 
+import com.giddyplanet.embrace.tools.model.TypeResolver;
 import com.giddyplanet.embrace.tools.model.webidl.*;
 import com.giddyplanet.embrace.tools.model.webidl.Enumeration;
 
@@ -14,10 +15,12 @@ public class JavaWriter {
     private final File srcFolder;
     private File packageFolder;
     private String javaPackage;
+    private TypeResolver resolver;
 
-    public JavaWriter(File srcFolder, String javaPackage) {
+    public JavaWriter(File srcFolder, String javaPackage, TypeResolver resolver) {
         this.srcFolder = srcFolder;
         this.javaPackage = javaPackage;
+        this.resolver = resolver;
         if (srcFolder != null && javaPackage != null) {
             packageFolder = getPackagePath(srcFolder, javaPackage);
         } else {
@@ -68,24 +71,10 @@ public class JavaWriter {
         sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("\n");
 
-        sb.append("public enum " + e.getName() + " {\n");
-        for (Iterator<String> iterator = e.getValues().iterator(); iterator.hasNext(); ) {
-            String s = iterator.next();
-            sb.append(INDENT);
-            sb.append(makeIdentifier(s)).append("(\"").append(s).append("\")");
-            if (iterator.hasNext()) {
-                sb.append(",\n");
-            } else {
-                sb.append(";\n");
-            }
+        sb.append("public interface " + e.getName() + " {\n");
+        for (String s : e.getValues()) {
+            sb.append(INDENT).append("String ").append(makeIdentifier(s).toUpperCase()).append(" = \"").append(s).append("\";\n");
         }
-        sb.append(INDENT).append("private final String text;\n");
-        sb.append(INDENT).append("private ").append(e.getName()).append("(String text) {\n");
-        sb.append(INDENT).append(INDENT).append("this.text = text;\n");
-        sb.append(INDENT).append("}\n");
-        sb.append(INDENT).append("public String toString() {\n");
-        sb.append(INDENT).append(INDENT).append("return text;\n");
-        sb.append(INDENT).append("}\n");
         sb.append("}\n");
         return sb.toString();
     }
@@ -325,6 +314,13 @@ public class JavaWriter {
 
         if (type.startsWith("Promise<")) {
             return "Object";
+        }
+
+        Definition resolved = resolver.resolve(type);
+        if (resolved != null) {
+            if (resolved instanceof Enumeration) {
+                return "String";
+            }
         }
 
         switch (type) {

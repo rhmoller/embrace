@@ -1,6 +1,7 @@
 package com.giddyplanet.embrace.tools;
 
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
+import com.giddyplanet.embrace.tools.model.TypeResolver;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
 import com.giddyplanet.embrace.tools.model.webidl.Interface;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
@@ -45,7 +46,7 @@ public class TranspilerTest {
         ModelBuildingListener listener = new ModelBuildingListener();
         WebIdlToJava.transpile(listener, new FileReader(idlPath.toFile()));
 
-        JavaWriter writer = new JavaWriter(null, null);
+        JavaWriter writer = new JavaWriter(null, null, new DummyTypeResolver());
         StringBuilder sb = new StringBuilder();
         for (Definition type : listener.getModel().getTypes().values()) {
             sb.append(writer.createSource((Interface) type));
@@ -61,4 +62,10 @@ public class TranspilerTest {
         return folder.resolve(base + ".java");
     }
 
+    private static class DummyTypeResolver implements TypeResolver {
+        @Override
+        public Definition resolve(String type) {
+            return null;
+        }
+    }
 }
