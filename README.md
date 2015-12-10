@@ -9,8 +9,10 @@ The project consists of three sub-projects:
 
 ## Taking it for a spin
 
+```
 ./gradlew :webapis:jar
 ./gradlew :examples:run
+```
 
 and point your browser to http://localhost:8888/com.giddyplanet.embrace.examples.Examples/
 
@@ -34,7 +36,8 @@ will be much appreciated!
 
 ## Status
 
-The project handles most WebIDL definition types and produces usable code. Noticeable missing features are:
+The project handles most WebIDL definition types and produces usable code. It has some rough edges 
+and the code is a mess. Noticeable missing features are:
 
 * typedef - will currently be represented as Object
 * dictionary - will currently be represented as Object
