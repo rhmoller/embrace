@@ -20,6 +20,8 @@ dependencies {
 }
 
 task run(type: JavaExec) {
+    mkdir("build/work")
+
     classpath = sourceSets.main.runtimeClasspath
     classpath += files("${projectDir}/src/main/java")
     classpath += files("${projectDir}/../webapis/build/libs/webapis.jar")
@@ -28,6 +30,8 @@ task run(type: JavaExec) {
 }
 
 task gwtc(type: JavaExec) {
+    mkdir("build/work")
+
     classpath = sourceSets.main.runtimeClasspath
     classpath += files("${projectDir}/src/main/java")
     classpath += files("${projectDir}/../webapis/build/libs/webapis.jar")
