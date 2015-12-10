@@ -7,6 +7,13 @@ The project consists of three sub-projects:
 * webapis - a GWT module containing JSInterop stubs for a selection of HTML5 APIs (similar to Elemental)
 * examples - small examples of what you can do with the project currently
 
+## Taking it for a spin
+
+./gradlew :webapis:jar
+./gradlew :examples:run
+
+and point your browser to http://localhost:8888/com.giddyplanet.embrace.examples.Examples/
+
 ## Project Philosophy
 
 The GWT team is working on a similar tool and Elemental 2. 
