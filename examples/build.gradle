@@ -10,10 +10,6 @@ repositories {
 dependencies {
     compile files("${projectDir}/../webapis/build/libs/webapis.jar")
 
-//    compile 'com.google.gwt:gwt-user:2.8.0-beta1'
-//    compile "com.google.gwt:gwt-dev:2.8.0-beta1"
-//    compile "com.google.gwt:gwt-codeserver:2.8.0-beta1"
-
     compile 'com.google.gwt:gwt-user:2.8.0-SNAPSHOT'
     compile "com.google.gwt:gwt-dev:2.8.0-SNAPSHOT"
     compile "com.google.gwt:gwt-codeserver:2.8.0-SNAPSHOT"
