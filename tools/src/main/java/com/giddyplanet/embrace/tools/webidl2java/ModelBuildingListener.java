@@ -266,6 +266,23 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     }
 
     @Override
+    public void enterStringifierRest(WebIDLParser.StringifierRestContext ctx) {
+        super.enterStringifierRest(ctx);
+        WebIDLParser.AttributeRestContext attributeCtx = ctx.attributeRest();
+        if (currentType != null && attributeCtx != null) {
+            WebIDLParser.SingleTypeContext singleType = attributeCtx.type().singleType();
+            if (singleType != null) {
+                String type = singleType.getText();
+                WebIDLParser.AttributeNameContext nameContext = attributeCtx.attributeName();
+                String name = (nameContext.attributeNameKeyword() == null) ? nameContext.IDENTIFIER_WEBIDL().getText() : "required";
+                Attribute attribute = new Attribute(type, name);
+                attribute.setReadOnly(true);
+                currentType.addAttribute(attribute);
+            }
+        }
+    }
+
+    @Override
     public void enterTypedef(WebIDLParser.TypedefContext ctx) {
         super.enterTypedef(ctx);
         unionMembers.clear();
