@@ -35,6 +35,12 @@ Web IDL grammar derived from:
 
     Web IDL (Second Edition)
     W3C Editor's Draft 17 November 2015
+
+
+Notice: This version has been modified by Rene Hangstrup Møller to handle
+    IDL fragments written tot the 1.0 spec and other derived versions of
+    Web IDL and to improve the parse tree generated for extended attributes.
+
  */
 grammar WebIDL;
 
