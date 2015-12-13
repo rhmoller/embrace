@@ -387,10 +387,15 @@ extendedAttributes
 ;
 
 extendedAttribute
-	: '(' extendedAttributeInner ')' extendedAttributeRest
-	| '[' extendedAttributeInner ']' extendedAttributeRest
-	| '{' extendedAttributeInner '}' extendedAttributeRest
-	| other extendedAttributeRest
+//	: '(' extendedAttributeInner ')' extendedAttributeRest
+//	| '[' extendedAttributeInner ']' extendedAttributeRest
+//	| '{' extendedAttributeInner '}' extendedAttributeRest
+//	| other extendedAttributeRest
+    : extendedAttributeNoArgs
+    | extendedAttributeArgList
+    | extendedAttributeNamedArgList
+    | extendedAttributeIdent
+    | extendedAttributeIdentList
 ;
 
 extendedAttributeRest

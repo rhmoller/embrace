@@ -27,6 +27,7 @@ public class EventExample implements Example {
         button.addEventListener("click", (e) -> {
             getWindow().alert("Hello, happy clicker!");
         }, false);
+        button.innerHTML = "Click Me!";
 
         div.appendChild(button);
         return div;

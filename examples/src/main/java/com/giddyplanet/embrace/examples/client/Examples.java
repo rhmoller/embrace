@@ -4,9 +4,9 @@ import com.giddyplanet.embrace.examples.client.canvas.CanvasExample;
 import com.giddyplanet.embrace.examples.client.event.EventExample;
 import com.giddyplanet.embrace.examples.client.hello.HelloExample;
 import com.giddyplanet.embrace.examples.client.timer.TimerExample;
+import com.giddyplanet.embrace.examples.client.websocket.WebSocketExample;
 import com.giddyplanet.embrace.webapis.*;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,20 +23,15 @@ public class Examples implements EntryPoint {
         addExample(new EventExample());
         addExample(new CanvasExample());
         addExample(new TimerExample());
+        addExample(new WebSocketExample());
 
         buildMenu();
-
-        // oddity: remove this line and the program will fail.
-        GWT.log("what: " + (doc.nodeType == Node.ELEMENT_NODE));
-        Window window = getWindow();
-        window.setTimeout((MyFunction) (args) -> window.alert("Time is up! " + args), 2000, "World");
-
     }
 
     private void buildMenu() {
         doc = getDocument();
 
-        Element ul1 = doc.createElement("ul");
+        HTMLElement ul = (HTMLElement) doc.createElement("ul");
         for (Map.Entry<String, Example> entry : examples.entrySet()) {
             Example example1 = entry.getValue();
 
@@ -47,9 +42,10 @@ public class Examples implements EntryPoint {
             a.setAttribute("data-example", example1.getId());
 
             li.appendChild(a);
-            ul1.appendChild(li);
+            ul.appendChild(li);
         }
-        Element ul = ul1;
+        ul.style.setProperty("float", "left");
+        ul.style.setProperty("margin-right", "2em");
         doc.body.appendChild(ul);
 
         Element container = doc.createElement("div");

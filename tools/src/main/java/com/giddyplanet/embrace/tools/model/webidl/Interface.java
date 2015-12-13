@@ -5,7 +5,7 @@ import java.util.*;
 public class Interface implements Definition {
     boolean resolved;
     String name;
-    LinkedHashSet<HasArguments> constructors = new LinkedHashSet<>();
+    LinkedHashSet<Operation> constructors = new LinkedHashSet<>();
     LinkedHashSet<Operation> operations = new LinkedHashSet<>();
     LinkedHashSet<Attribute> attributes = new LinkedHashSet<>();
     Interface superType;
@@ -26,11 +26,11 @@ public class Interface implements Definition {
         this.name = name;
     }
 
-    public void addConstructor(HasArguments operation) {
+    public void addConstructor(Operation operation) {
         constructors.add(operation);
     }
 
-    public List<HasArguments> getConstructors() {
+    public List<Operation> getConstructors() {
         return new ArrayList<>(constructors);
     }
 
