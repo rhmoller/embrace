@@ -132,7 +132,7 @@ public class JavaWriter {
         sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
 
         Set<String> extendedAttributes = ((Interface) definition).getExtendedAttributes();
-        long constructorCount = extendedAttributes.stream().filter(s -> s.startsWith("Constructor") || s.startsWith("NamedConstructor")).count();
+        long constructorCount = definition.getConstructors().size();
         Interface superType = ((Interface) definition).getSuperType();
 
         boolean isAbstract = false;
@@ -204,6 +204,18 @@ public class JavaWriter {
             }
         }
 
+
+        boolean missingDefaultConstructor = (!isAbstract && !isInterface && constructorCount > 0);
+
+        for (Operation constructor : definition.getConstructors()) {
+            boolean wroteEmpty = writeConstructor(definition, sb, constructor);
+            missingDefaultConstructor &= !wroteEmpty;
+        }
+
+        if (missingDefaultConstructor) {
+            sb.append(INDENT).append("protected ").append(definition.getName()).append("() {}\n");
+        }
+
         for (Operation operation : ((Interface) definition).getOperations()) {
             // todo: hack for HTMLFormControlsCollection
             if ("namedItem".equals(operation.getName()) && "HTMLCollection".equals(definition.getName())) {
@@ -224,6 +236,31 @@ public class JavaWriter {
         return sb.toString();
     }
 
+    private boolean writeConstructor(Interface definition, StringBuilder sb, Operation constructor) {
+        boolean wroteEmptyConstructor = false;
+
+        sb.append(INDENT).append("public ").append(definition.getName()).append("(");
+        writeArguments(sb, constructor);
+        sb.append(") {}\n");
+        List<Argument> arguments = constructor.getArguments();
+        if (arguments.isEmpty()) {
+            wroteEmptyConstructor = true;
+        }
+
+        if (arguments.size() > 0 && arguments.get(arguments.size() - 1).isOptional()) {
+            Operation op2 = new Operation(constructor.getName());
+            for (Iterator<Argument> iterator = arguments.iterator(); iterator.hasNext(); ) {
+                Argument arg = iterator.next();
+                if (iterator.hasNext()) {
+                    op2.addArgument(arg.getType(), arg.getName());
+                }
+            }
+            wroteEmptyConstructor = writeConstructor(definition, sb, op2);
+        }
+
+        return wroteEmptyConstructor;
+    }
+
     private void collectNoInterfaceObjectAttributes(Interface definition, Set<Attribute> attributes) {
         if (definition.getExtendedAttributes().contains("NoInterfaceObject")) {
             attributes.addAll(definition.getAttributes());
@@ -239,7 +276,7 @@ public class JavaWriter {
     }
 
     private void collectAbstractMethods(Interface definition, Set<Operation> ops) {
-        if (definition.getExtendedAttributes().contains("NoInterfaceObject") || !definition.getExtendedAttributes().stream().anyMatch(s -> s.startsWith("Constructor"))) {
+        if (definition.getExtendedAttributes().contains("NoInterfaceObject") || definition.getConstructors().isEmpty()) {
             ops.addAll(definition.getOperations());
         }
 
@@ -262,19 +299,7 @@ public class JavaWriter {
             sb.append(fixType(operation.getReturnType()));
         }
         sb.append(" ").append(operation.getName()).append("(");
-        List<Argument> arguments = operation.getArguments();
-        for (Iterator<Argument> iterator = arguments.iterator(); iterator.hasNext(); ) {
-            Argument argument = iterator.next();
-            sb.append(fixType(argument.getType()));
-            if (argument.isVarArgs()) {
-                sb.append("...");
-            }
-            sb.append(" ");
-            sb.append(fixName(argument.getName()));
-            if (iterator.hasNext()) {
-                sb.append(", ");
-            }
-        }
+        List<Argument> arguments = writeArguments(sb, operation);
         sb.append(");\n");
 
         if (arguments.size() > 0 && arguments.get(arguments.size() - 1).isOptional()) {
@@ -288,6 +313,23 @@ public class JavaWriter {
             }
             writeOperation(sb, isInterface, op2);
         }
+    }
+
+    private List<Argument> writeArguments(StringBuilder sb, Operation operation) {
+        List<Argument> arguments = operation.getArguments();
+        for (Iterator<Argument> iterator = arguments.iterator(); iterator.hasNext(); ) {
+            Argument argument = iterator.next();
+            sb.append(fixType(argument.getType()));
+            if (argument.isVarArgs()) {
+                sb.append("...");
+            }
+            sb.append(" ");
+            sb.append(fixName(argument.getName()));
+            if (iterator.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        return arguments;
     }
 
     private void writeInterfaces(Interface definition, StringBuilder sb, String prefix) {
@@ -325,6 +367,9 @@ public class JavaWriter {
         }
 
         switch (type) {
+            case "void":
+                return "void";
+
             case "DOMString":
             case "USVString":
             case "ByteString":
@@ -375,7 +420,7 @@ public class JavaWriter {
                 return "Object";
         }
 
-        return type;
+        return resolved == null ? "Object" : type;
     }
 
     private String box(String type) {

@@ -15,7 +15,14 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     HasArguments currentMethod = null;
     Enumeration currentEnum = null;
     Set<String> unionMembers = new HashSet<>();
+    Set<Operation> constructors = new HashSet<>();
     private boolean callbackInterface = false;
+
+
+    @Override
+    public void enterExtendedAttribute(WebIDLParser.ExtendedAttributeContext ctx) {
+        typeExtendedAttributes.add(ctx.getText());
+    }
 
     @Override
     public void enterOther(WebIDLParser.OtherContext ctx) {
@@ -26,12 +33,57 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     }
 
     @Override
+    public void enterExtendedAttributeNoArgs(WebIDLParser.ExtendedAttributeNoArgsContext ctx) {
+        super.enterExtendedAttributeNoArgs(ctx);
+        if (ctx.IDENTIFIER_WEBIDL().toString().equals("Constructor")) {
+            currentMethod = new Operation("<init>");
+            System.out.println("Preparing constructor");
+        }
+    }
+
+    @Override
+    public void exitExtendedAttributeNoArgs(WebIDLParser.ExtendedAttributeNoArgsContext ctx) {
+        super.exitExtendedAttributeNoArgs(ctx);
+        if (currentMethod != null) {
+            constructors.add((Operation) currentMethod);
+            System.out.println("adding constructor");
+        }
+        currentMethod = null;
+    }
+
+    @Override
+    public void enterExtendedAttributeArgList(WebIDLParser.ExtendedAttributeArgListContext ctx) {
+        super.enterExtendedAttributeArgList(ctx);
+        if (ctx.IDENTIFIER_WEBIDL().toString().equals("Constructor")) {
+            currentMethod = new Operation("<init>");
+            System.out.println("Preparing constructor");
+        }
+        typeExtendedAttributes.add(ctx.getText());
+    }
+
+    @Override
+    public void exitExtendedAttributeArgList(WebIDLParser.ExtendedAttributeArgListContext ctx) {
+        super.exitExtendedAttributeArgList(ctx);
+        if (currentMethod != null) {
+            System.out.println("adding constructor");
+            constructors.add((Operation) currentMethod);
+        }
+        currentMethod = null;
+    }
+
+    @Override
     public void enterInterface_(WebIDLParser.Interface_Context ctx) {
         super.enterInterface_(ctx);
         String name = ctx.IDENTIFIER_WEBIDL().toString();
         currentType = model.getOrCreateInterface(name);
         currentType.setCallback(callbackInterface);
-        // todo: iterate over extended attributes and detect all constructors (with args)
+
+        System.out.println(constructors.size() + " pending constructors for " + name);
+        for (Operation constructor : constructors) {
+            currentType.addConstructor(constructor);
+        }
+        constructors.clear();
+
         currentType.getExtendedAttributes().addAll(typeExtendedAttributes);
         if (ctx.inheritance() != null && ctx.inheritance().IDENTIFIER_WEBIDL() != null) {
             String superTypeName = ctx.inheritance().IDENTIFIER_WEBIDL().getText();
@@ -52,12 +104,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         super.enterPartialInterface(ctx);
         String name = ctx.IDENTIFIER_WEBIDL().toString();
         currentType = model.getOrCreateInterface(name);
-        // todo: iterate over extended attributes and detect all constructors (with args)
-        currentType.getExtendedAttributes().addAll(typeExtendedAttributes);
-        boolean hasConstructor = typeExtendedAttributes.contains("Constructor");
-        if (hasConstructor) {
-            currentType.addConstructor(new Operation("<init>>"));
-        }
     }
 
     @Override
@@ -309,6 +355,11 @@ public class ModelBuildingListener extends WebIDLBaseListener {
             String text = id.getText();
             currentEnum.addValue(text.substring(1, text.length() - 1));
         }
+    }
+
+    public Operation startConstructor() {
+        currentMethod = new Operation("<init>");
+        return (Operation) currentMethod;
     }
 
     public Model getModel() {
