@@ -41,7 +41,7 @@ public class WebSocketExample implements Example {
         webSocket.onerror = new MyFunction<Object>() {
             @Override
             public void execute(Object... args) {
-                textbox.textContent += "Error";
+                textbox.textContent += "Error. Do you have a websocket server running?";
             }
         };
 
