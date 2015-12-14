@@ -11,10 +11,11 @@ The project consists of three sub-projects:
 
 ```
 ./gradlew :webapis:jar
+./gradlew :exampleS:gwtc
 ./gradlew :examples:run
 ```
 
-and point your browser to http://localhost:8888/com.giddyplanet.embrace.examples.Examples/
+and point your browser to http://localhost:8080/com.giddyplanet.embrace.examples.Examples/
 
 ## Project Philosophy
 

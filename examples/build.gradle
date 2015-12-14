@@ -1,5 +1,16 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.akhikhl.gretty:gretty:+'
+    }
+}
 
 repositories {
     maven {
@@ -17,7 +28,11 @@ dependencies {
     compile "javax.websocket:javax.websocket-api:1.1"
 }
 
-task run(type: JavaExec) {
+gretty {
+    extraResourceBase 'build/gwtc/war'
+}
+
+task devmode(type: JavaExec) {
     mkdir("build/work")
 
     classpath = sourceSets.main.runtimeClasspath
@@ -34,6 +49,6 @@ task gwtc(type: JavaExec) {
     classpath += files("${projectDir}/src/main/java")
     classpath += files("${projectDir}/../webapis/build/libs/webapis.jar")
     main = "com.google.gwt.dev.Compiler"
-    args "-saveSource -compileReport -gen build/gen -workDir build/work -extra build/extra com.giddyplanet.embrace.examples.Examples".split().toList()
+    args "-war build/gwtc/war  com.giddyplanet.embrace.examples.Examples".split().toList()
 //    args "-style DETAILED -saveSource -compileReport -gen build/gen -workDir build/work -extra build/extra com.giddyplanet.embrace.examples.Examples".split().toList()
 }
