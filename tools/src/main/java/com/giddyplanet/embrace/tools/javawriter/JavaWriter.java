@@ -122,6 +122,7 @@ public class JavaWriter {
             sb.append("package ").append(javaPackage).append(";\n");
             sb.append("\n");
         }
+        sb.append("import jsinterop.annotations.JsFunction;\n");
         sb.append("import jsinterop.annotations.JsIgnore;\n");
         sb.append("import jsinterop.annotations.JsOverlay;\n");
         sb.append("import jsinterop.annotations.JsPackage;\n");
@@ -129,7 +130,11 @@ public class JavaWriter {
         sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("\n");
 
-        sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+        if (definition.isCallback()) {
+            sb.append("@JsFunction\n");
+        } else {
+            sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+        }
 
         Set<String> extendedAttributes = ((Interface) definition).getExtendedAttributes();
         long constructorCount = definition.getConstructors().size();
@@ -185,7 +190,9 @@ public class JavaWriter {
 
         for (Constant constant : ((Interface) definition).getConstants()) {
             if (isInterface) {
-                sb.append(INDENT).append("@JsOverlay ");
+                if (!definition.isCallback()) {
+                    sb.append(INDENT).append("@JsOverlay ");
+                }
                 sb.append(INDENT).append("public static final ").append(fixType(constant.getType())).append(" ").append(constant.getName()).append("= ").append(constant.getValue()).append(";\n");
             } else {
                 sb.append(INDENT).append("public static ").append(fixType(constant.getType())).append(" ").append(constant.getName()).append("; // = ").append(constant.getValue()).append("\n");

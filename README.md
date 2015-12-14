@@ -1,8 +1,6 @@
 # embrace
 Embrace native web APIs from GWT by generating JSInterop stubs from WebIDL definitions.
 
-:warning: This project is currently cripled by a bug in JSInterop [#9244](https://github.com/gwtproject/gwt/issues/9244)
-
 The project consists of three sub-projects:
 
 * tools - contains command line tools for converting WebIDL to JsInterop source files.
