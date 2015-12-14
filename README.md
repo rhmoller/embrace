@@ -11,7 +11,7 @@ The project consists of three sub-projects:
 
 ```
 ./gradlew :webapis:jar
-./gradlew :exampleS:gwtc
+./gradlew :examples:gwtc
 ./gradlew :examples:run
 ```
 
