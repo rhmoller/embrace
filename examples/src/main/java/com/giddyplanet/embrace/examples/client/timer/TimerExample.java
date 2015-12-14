@@ -2,6 +2,7 @@ package com.giddyplanet.embrace.examples.client.timer;
 
 import com.giddyplanet.embrace.examples.client.Example;
 import com.giddyplanet.embrace.examples.client.MyFunction;
+import com.giddyplanet.embrace.examples.client.MyFunction1;
 import com.giddyplanet.embrace.webapis.Document;
 import com.giddyplanet.embrace.webapis.HTMLDivElement;
 import com.giddyplanet.embrace.webapis.HTMLElement;
@@ -29,7 +30,7 @@ public class TimerExample implements Example {
         div.innerHTML = "Soon, you will see a popup";
 
         Window window = getWindow();
-        window.setTimeout((MyFunction) (args) -> window.alert("Time is up! " + args), 2000);
+        window.setTimeout((MyFunction1<String>) (args) -> window.alert("Time is up! " + args), 2000, "Hello, there!");
 
         return div;
     }
