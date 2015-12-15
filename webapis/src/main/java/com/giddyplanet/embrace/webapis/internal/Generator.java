@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
@@ -30,6 +31,7 @@ public class Generator {
         addSpec(listener, new File("data/serialization.html"));
         addSpec(listener, new File("data/whatwg.html"));
         addSpec(listener, new File("data/cssom.html"));
+        addSpec(listener, new File("data/builtin.idl"));
 //        addSpec(listener, new URL("https://html.spec.whatwg.org/"));
 //        addSpec(listener, new URL("https://dom.spec.whatwg.org/"));
 
@@ -54,13 +56,19 @@ public class Generator {
     }
 
     private static void addSpec(ModelBuildingListener listener, File file) throws IOException {
-        Document doc = Jsoup.parse(file, "UTF-8");
-        Elements fragments = doc.select("pre.idl,pre.extraidl");
-        for (Element fragment : fragments) {
-            if (fragment.hasClass("extract")) continue;
-            String idl = fragment.text();
+        if (file.getName().endsWith(".idl")) {
+            String idl = new String(Files.readAllBytes(file.toPath()), "UTF-8");
             StringReader reader = new StringReader(idl);
             WebIdlToJava.transpile(listener, reader);
+        } else {
+            Document doc = Jsoup.parse(file, "UTF-8");
+            Elements fragments = doc.select("pre.idl,pre.extraidl");
+            for (Element fragment : fragments) {
+                if (fragment.hasClass("extract")) continue;
+                String idl = fragment.text();
+                StringReader reader = new StringReader(idl);
+                WebIdlToJava.transpile(listener, reader);
+            }
         }
     }
 

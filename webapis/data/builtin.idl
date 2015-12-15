@@ -1,0 +1,6 @@
+// Derived from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[JavaName=JsObject]
+interface Object {
+    static void observe(any obj, any callback, DOMString[]? acceptList);
+};
