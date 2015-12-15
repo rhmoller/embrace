@@ -3,6 +3,7 @@ package com.giddyplanet.embrace.examples.client;
 import com.giddyplanet.embrace.examples.client.canvas.CanvasExample;
 import com.giddyplanet.embrace.examples.client.event.EventExample;
 import com.giddyplanet.embrace.examples.client.hello.HelloExample;
+import com.giddyplanet.embrace.examples.client.observable.ObservableExample;
 import com.giddyplanet.embrace.examples.client.timer.TimerExample;
 import com.giddyplanet.embrace.examples.client.websocket.WebSocketExample;
 import com.giddyplanet.embrace.webapis.*;
@@ -24,6 +25,7 @@ public class Examples implements EntryPoint {
         addExample(new CanvasExample());
         addExample(new TimerExample());
         addExample(new WebSocketExample());
+        addExample(new ObservableExample());
 
         buildMenu();
     }
