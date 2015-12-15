@@ -1,4 +1,4 @@
-package com.giddyplanet.embrace.examples.server;
+package com.giddyplanet.embrace.examples.server.websocket;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.OnMessage;

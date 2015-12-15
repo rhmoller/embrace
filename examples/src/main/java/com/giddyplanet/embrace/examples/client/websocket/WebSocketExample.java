@@ -1,8 +1,8 @@
 package com.giddyplanet.embrace.examples.client.websocket;
 
 import com.giddyplanet.embrace.examples.client.Example;
-import com.giddyplanet.embrace.examples.client.MyFunction;
-import com.giddyplanet.embrace.examples.client.MyFunction1;
+import com.giddyplanet.embrace.examples.client.util.function.VariadicVoidFunction;
+import com.giddyplanet.embrace.examples.client.util.function.UnaryVoidFunction;
 import com.giddyplanet.embrace.webapis.*;
 
 import static com.giddyplanet.embrace.examples.client.Examples.getDocument;
@@ -32,30 +32,30 @@ public class WebSocketExample implements Example {
 
         WebSocket webSocket = new WebSocket("ws://localhost:8080/examples/echo");
 
-        webSocket.onopen = new MyFunction() {
+        webSocket.onopen = new VariadicVoidFunction() {
             @Override
-            public void execute(Object[] args) {
+            public void apply(Object[] args) {
                 textbox.textContent += "Opened connection\n";
             }
         };
 
-        webSocket.onerror = new MyFunction<Object>() {
+        webSocket.onerror = new VariadicVoidFunction<Object>() {
             @Override
-            public void execute(Object... args) {
+            public void apply(Object... args) {
                 textbox.textContent += "Error. Do you have a websocket server running?\n";
             }
         };
 
-        webSocket.onmessage = new MyFunction1<MessageEvent>() {
+        webSocket.onmessage = new UnaryVoidFunction<MessageEvent>() {
             @Override
-            public void execute(MessageEvent e) {
+            public void apply(MessageEvent e) {
                 textbox.textContent += e.data;
             }
         };
 
-        input.onchange = new MyFunction() {
+        input.onchange = new VariadicVoidFunction() {
             @Override
-            public void execute(Object[] args) {
+            public void apply(Object[] args) {
                 webSocket.send(input.value);
             }
         };
