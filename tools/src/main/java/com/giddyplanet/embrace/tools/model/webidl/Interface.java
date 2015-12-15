@@ -18,6 +18,15 @@ public class Interface implements Definition {
         this.name = name;
     }
 
+    public String getJavaName() {
+        for (String extendedAttribute : extendedAttributes) {
+            if (extendedAttribute.startsWith("JavaName=")) {
+                return extendedAttribute.substring(9);
+            }
+        }
+        return name;
+    }
+
     public String getName() {
         return name;
     }

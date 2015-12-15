@@ -37,7 +37,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         super.enterExtendedAttributeNoArgs(ctx);
         if (ctx.IDENTIFIER_WEBIDL().toString().equals("Constructor")) {
             currentMethod = new Operation("<init>");
-            System.out.println("Preparing constructor");
         }
     }
 
@@ -46,7 +45,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         super.exitExtendedAttributeNoArgs(ctx);
         if (currentMethod != null) {
             constructors.add((Operation) currentMethod);
-            System.out.println("adding constructor");
         }
         currentMethod = null;
     }
@@ -56,7 +54,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         super.enterExtendedAttributeArgList(ctx);
         if (ctx.IDENTIFIER_WEBIDL().toString().equals("Constructor")) {
             currentMethod = new Operation("<init>");
-            System.out.println("Preparing constructor");
         }
         typeExtendedAttributes.add(ctx.getText());
     }
@@ -65,7 +62,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     public void exitExtendedAttributeArgList(WebIDLParser.ExtendedAttributeArgListContext ctx) {
         super.exitExtendedAttributeArgList(ctx);
         if (currentMethod != null) {
-            System.out.println("adding constructor");
             constructors.add((Operation) currentMethod);
         }
         currentMethod = null;
@@ -78,7 +74,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         currentType = model.getOrCreateInterface(name);
         currentType.setCallback(callbackInterface);
 
-        System.out.println(constructors.size() + " pending constructors for " + name);
         for (Operation constructor : constructors) {
             currentType.addConstructor(constructor);
         }
@@ -164,6 +159,42 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         }
     }
 
+    @Override
+    public void enterStaticMemberRest(WebIDLParser.StaticMemberRestContext ctx) {
+        super.enterStaticMemberRest(ctx);
+
+        WebIDLParser.OperationRestContext rest = ctx.operationRest();
+        if (rest != null && rest.optionalIdentifier() != null) {
+            TerminalNode id = rest.optionalIdentifier().IDENTIFIER_WEBIDL();
+
+            System.out.println("Static method " + id);
+
+            String name = id.toString();
+            currentMethod = new Operation(name);
+            ((Operation)currentMethod).setStatic(true);
+
+            WebIDLParser.TypeContext type = ctx.returnType().type();
+            String text1;
+            if (type != null && type.unionType() != null) {
+                text1 = "Object";
+            } else {
+                text1 = ctx.returnType().getText();
+            }
+            String text = text1;
+            currentMethod.setReturnType(text);
+        }
+
+    }
+
+    @Override
+    public void exitStaticMemberRest(WebIDLParser.StaticMemberRestContext ctx) {
+        super.exitStaticMemberRest(ctx);
+        if (currentMethod != null && currentType != null) {
+            currentType.addOperation((Operation) currentMethod);
+        }
+        currentMethod = null;
+    }
+
     private void getSpecials(WebIDLParser.SpecialOperationContext specialOp, Set<String> specials) {
         if (specialOp.special() != null) {
             specials.add(specialOp.special().getText());
@@ -192,7 +223,7 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         if (type != null && type.unionType() != null) {
             returnType = "Object";
         } else if (type == null) {
-            returnType ="void";
+            returnType = "void";
         } else {
             returnType = type.getText();
         }

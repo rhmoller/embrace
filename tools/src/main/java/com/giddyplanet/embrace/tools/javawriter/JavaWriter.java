@@ -3,6 +3,7 @@ package com.giddyplanet.embrace.tools.javawriter;
 import com.giddyplanet.embrace.tools.model.TypeResolver;
 import com.giddyplanet.embrace.tools.model.webidl.*;
 import com.giddyplanet.embrace.tools.model.webidl.Enumeration;
+import com.giddyplanet.embrace.tools.model.webidl.Exception;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class JavaWriter {
     public void createSourceFile(Definition definition) throws IOException {
         if (definition instanceof Interface) {
             String src = createSource((Interface) definition);
-            File srcFile = new File(packageFolder, ((Interface) definition).getName() + ".java");
+            File srcFile = new File(packageFolder, ((Interface) definition).getJavaName() + ".java");
             Files.write(srcFile.toPath(), src.getBytes("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         } else if (definition instanceof Enumeration) {
             Enumeration e = (Enumeration) definition;
@@ -133,7 +134,11 @@ public class JavaWriter {
         if (definition.isCallback()) {
             sb.append("@JsFunction\n");
         } else {
-            sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+            if (definition.getName().equals(definition.getJavaName())) {
+                sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+            } else {
+                sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL, name = \"" + definition.getName() + "\")\n");
+            }
         }
 
         Set<String> extendedAttributes = ((Interface) definition).getExtendedAttributes();
@@ -143,10 +148,12 @@ public class JavaWriter {
         boolean isAbstract = false;
         boolean isInterface = false;
 
+        String typeName = definition.getJavaName();
+
         if (constructorCount > 0) {
             isAbstract = false;
             isInterface = false;
-            sb.append("public class ").append(((Interface) definition).getName());
+            sb.append("public class ").append(typeName);
             boolean superIsInterface = false;
             if (superType != null) {
                 superIsInterface = superType.isCallback() || superType.getExtendedAttributes().stream().anyMatch(s -> "NoInterfaceObject".equals(s));
@@ -167,7 +174,7 @@ public class JavaWriter {
             if (definition.isCallback() || extendedAttributes.stream().anyMatch(s -> "NoInterfaceObject".equals(s))) {
                 isAbstract = false;
                 isInterface = true;
-                sb.append("public interface ").append(((Interface) definition).getName());
+                sb.append("public interface ").append(typeName);
                 writeInterfaces((Interface) definition, sb, " extends ");
                 if (superType != null) {
                     if (((Interface) definition).getInterfaces().isEmpty()) {
@@ -179,7 +186,7 @@ public class JavaWriter {
             } else {
                 isAbstract = true;
                 isInterface = false;
-                sb.append("public abstract class ").append(((Interface) definition).getName());
+                sb.append("public abstract class ").append(typeName);
                 if (superType != null) {
                     sb.append(" extends ").append(superType.getName());
                 }
@@ -302,7 +309,11 @@ public class JavaWriter {
         if (isInterface) {
             sb.append(fixType(operation.getReturnType()));
         } else {
-            sb.append(INDENT).append("public native ");
+            if (operation.isStatic()) {
+                sb.append(INDENT).append("public static native ");
+            } else {
+                sb.append(INDENT).append("public native ");
+            }
             sb.append(fixType(operation.getReturnType()));
         }
         sb.append(" ").append(operation.getName()).append("(");
@@ -382,13 +393,17 @@ public class JavaWriter {
             case "ByteString":
                 return "String";
 
+            case "short":
             case "unsignedshort":
                 return "short";
             case "long":
             case "unsignedlong":
                 return "int"; // long-int
+            case "double":
             case "unrestricteddouble":
                 return "double";
+            case "boolean":
+                return "boolean";
 
             case "ArrayBuffer":
                 return "com.google.gwt.typedarrays.shared.ArrayBuffer";
@@ -427,7 +442,7 @@ public class JavaWriter {
                 return "Object";
         }
 
-        return resolved == null ? "Object" : type;
+        return resolved == null || "Object".equals(type) ? "Object" : resolved instanceof Interface ? ((Interface) resolved).getJavaName() : type;
     }
 
     private String box(String type) {

@@ -7,6 +7,7 @@ public class Operation implements HasArguments {
     private String name;
     private String returnType;
     private List<Argument> arguments = new ArrayList<>();
+    private boolean isStatic;
 
     public Operation(String name) {
         this.name = name;
@@ -56,4 +57,13 @@ public class Operation implements HasArguments {
         result = 31 * result + arguments.hashCode();
         return result;
     }
+
+    public void setStatic(boolean isStatic) {
+        this.isStatic = isStatic;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
+    }
+
 }
