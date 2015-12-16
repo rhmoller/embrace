@@ -10,4 +10,5 @@ public interface Example {
 
     HTMLElement setup();
 
+    void start();
 }

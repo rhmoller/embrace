@@ -62,4 +62,9 @@ public class WebSocketExample implements Example {
 
         return panel;
     }
+
+    @Override
+    public void start() {
+
+    }
 }

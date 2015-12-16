@@ -61,4 +61,9 @@ public class CanvasExample implements Example {
 
         return canvas;
     }
+
+    @Override
+    public void start() {
+
+    }
 }

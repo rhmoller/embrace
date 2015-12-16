@@ -27,4 +27,9 @@ public class HelloExample implements Example {
         div.innerHTML = "Hello, World!";
         return div;
     }
+
+    @Override
+    public void start() {
+
+    }
 }

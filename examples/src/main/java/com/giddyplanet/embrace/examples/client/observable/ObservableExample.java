@@ -38,4 +38,9 @@ public class ObservableExample implements Example {
 
         return div;
     }
+
+    @Override
+    public void start() {
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.giddyplanet.embrace.examples.client;
 
+import com.giddyplanet.embrace.examples.client.batandball.BouncingBall;
 import com.giddyplanet.embrace.examples.client.canvas.CanvasExample;
 import com.giddyplanet.embrace.examples.client.event.EventExample;
 import com.giddyplanet.embrace.examples.client.hello.HelloExample;
@@ -26,6 +27,7 @@ public class Examples implements EntryPoint {
         addExample(new TimerExample());
         addExample(new WebSocketExample());
         addExample(new ObservableExample());
+        addExample(new BouncingBall());
 
         buildMenu();
     }
@@ -65,6 +67,7 @@ public class Examples implements EntryPoint {
 
             HTMLElement root = example.setup();
             container.appendChild(root);
+            example.start();
         }, false);
     }
 

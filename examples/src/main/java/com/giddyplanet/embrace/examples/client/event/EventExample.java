@@ -32,4 +32,9 @@ public class EventExample implements Example {
         div.appendChild(button);
         return div;
     }
+
+    @Override
+    public void start() {
+
+    }
 }

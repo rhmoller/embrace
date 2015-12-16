@@ -33,4 +33,9 @@ public class TimerExample implements Example {
 
         return div;
     }
+
+    @Override
+    public void start() {
+
+    }
 }
