@@ -15,7 +15,7 @@ The project consists of three sub-projects:
 ./gradlew :examples:run
 ```
 
-and point your browser to http://localhost:8080/com.giddyplanet.embrace.examples.Examples/
+and point your browser to http://localhost:8080/examples/com.giddyplanet.embrace.examples.Examples/
 
 ## Project Philosophy
 

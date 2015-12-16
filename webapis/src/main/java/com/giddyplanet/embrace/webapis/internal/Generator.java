@@ -20,20 +20,15 @@ import java.security.NoSuchAlgorithmException;
 
 public class Generator {
 
-//        "https://dom.spec.whatwg.org/",
-//        "https://html.spec.whatwg.org/"
-
     public static void main(String[] args) throws IOException, KeyManagementException, NoSuchAlgorithmException {
         Trust.trustAllCertificates();
 
         ModelBuildingListener listener = new ModelBuildingListener();
-        addSpec(listener, new File("data/dom.html"));
-        addSpec(listener, new File("data/serialization.html"));
-        addSpec(listener, new File("data/whatwg.html"));
-        addSpec(listener, new File("data/cssom.html"));
-        addSpec(listener, new File("data/builtin.idl"));
-//        addSpec(listener, new URL("https://html.spec.whatwg.org/"));
-//        addSpec(listener, new URL("https://dom.spec.whatwg.org/"));
+        File folder = new File("data");
+        File[] files = folder.listFiles();
+        for (File file : files) {
+            addSpec(listener, file);
+        }
 
         File srcFolder = new File("build/generated-src/java/main");
         srcFolder.mkdirs();
@@ -44,32 +39,24 @@ public class Generator {
         }
     }
 
-    private static void addSpec(ModelBuildingListener listener, URL url) throws IOException {
-        Document doc = Jsoup.parse(url, 300000);
-        Elements fragments = doc.select("pre.idl,pre.extraidl");
-        for (Element fragment : fragments) {
-            if (fragment.hasClass("extract")) continue;
-            String idl = fragment.text();
-            StringReader reader = new StringReader(idl);
-            WebIdlToJava.transpile(listener, reader);
-        }
-    }
-
     private static void addSpec(ModelBuildingListener listener, File file) throws IOException {
         if (file.getName().endsWith(".idl")) {
             String idl = new String(Files.readAllBytes(file.toPath()), "UTF-8");
-            StringReader reader = new StringReader(idl);
-            WebIdlToJava.transpile(listener, reader);
-        } else {
+            handleIdl(listener, idl);
+        } else if (file.getName().endsWith(".html")) {
             Document doc = Jsoup.parse(file, "UTF-8");
             Elements fragments = doc.select("pre.idl,pre.extraidl");
             for (Element fragment : fragments) {
                 if (fragment.hasClass("extract")) continue;
                 String idl = fragment.text();
-                StringReader reader = new StringReader(idl);
-                WebIdlToJava.transpile(listener, reader);
+                handleIdl(listener, idl);
             }
         }
+    }
+
+    private static void handleIdl(ModelBuildingListener listener, String idl) throws IOException {
+        StringReader reader = new StringReader(idl);
+        WebIdlToJava.transpile(listener, reader);
     }
 
 }

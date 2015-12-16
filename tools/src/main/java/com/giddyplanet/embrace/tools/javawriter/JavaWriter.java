@@ -86,6 +86,7 @@ public class JavaWriter {
             sb.append("package ").append(javaPackage).append(";\n");
             sb.append("\n");
         }
+        sb.append("import jsinterop.annotations.JsFunction;\n");
         sb.append("import jsinterop.annotations.JsIgnore;\n");
         sb.append("import jsinterop.annotations.JsOverlay;\n");
         sb.append("import jsinterop.annotations.JsPackage;\n");
@@ -93,11 +94,11 @@ public class JavaWriter {
         sb.append("import jsinterop.annotations.JsType;\n");
         sb.append("\n");
 
-        sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+        sb.append("@JsFunction\n");
 
         sb.append("public interface ").append(callback.getName()).append(" {\n");
         sb.append(INDENT).append(fixType(callback.getReturnType()));
-        sb.append(" ").append(callback.getName()).append("(");
+        sb.append(" ").append("execute").append("(");
         for (Iterator<Argument> iterator = callback.getArguments().iterator(); iterator.hasNext(); ) {
             Argument argument = iterator.next();
             sb.append(fixType(argument.getType()));
