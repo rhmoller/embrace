@@ -414,6 +414,11 @@ public class JavaWriter {
             case "Elements":
                 return "Element[]";
 
+            case "DOMTimeStamp":
+            case "DOMHighResTimeStamp":
+                return "Object"; // this really should be long
+
+
             case "any":
             case "object":
 
@@ -427,8 +432,6 @@ public class JavaWriter {
             case "MediaSource":
             case "DOMMatrix":
             case "DOMMatrixInit":
-            case "DOMTimeStamp":
-            case "DOMHighResTimeStamp":
             case "Function":
             case "WindowProxy":
             case "RenderingContext":
