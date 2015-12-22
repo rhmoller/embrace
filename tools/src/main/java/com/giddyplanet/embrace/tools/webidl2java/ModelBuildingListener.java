@@ -83,7 +83,9 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         if (ctx.inheritance() != null && ctx.inheritance().IDENTIFIER_WEBIDL() != null) {
             String superTypeName = ctx.inheritance().IDENTIFIER_WEBIDL().getText();
             Interface superType = model.getOrCreateInterface(superTypeName);
-            currentType.setSuperType(superType);
+            TypeRef<Interface> superRef = new TypeRef<>(superTypeName);
+            superRef.setResolved(superType);
+            currentType.setSuperType(superRef);
         }
     }
 

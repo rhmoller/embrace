@@ -2,8 +2,12 @@ package com.giddyplanet.embrace.tools;
 
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
 import com.giddyplanet.embrace.tools.model.TypeResolver;
+import com.giddyplanet.embrace.tools.model.java.JClass;
+import com.giddyplanet.embrace.tools.model.java.JavaModel;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
-import com.giddyplanet.embrace.tools.model.webidl.Interface;
+import com.giddyplanet.embrace.tools.model.webidl.Model;
+import com.giddyplanet.embrace.tools.model.webidl.SimpleTypeResolver;
+import com.giddyplanet.embrace.tools.webidl2java.ModelConverter;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,11 +50,19 @@ public class TranspilerTest {
         ModelBuildingListener listener = new ModelBuildingListener();
         WebIdlToJava.transpile(listener, new FileReader(idlPath.toFile()));
 
+        Model idlModel = listener.getModel();
+        ModelConverter converter = new ModelConverter(idlModel, new SimpleTypeResolver(idlModel));
+        JavaModel javaModel = converter.bind();
+
+
         JavaWriter writer = new JavaWriter(null, null, new DummyTypeResolver());
         StringBuilder sb = new StringBuilder();
-        for (Definition type : listener.getModel().getTypes().values()) {
-            sb.append(writer.createSource((Interface) type));
+        for (JClass type : javaModel.getTypes().values()) {
+            sb.append(writer.createSource(type));
         }
+//        for (Definition type : idlModel.getTypes().values()) {
+//            sb.append(writer.createSource((Interface) type));
+//        }
         String actualJava = sb.toString();
         assertEquals(expectedJava, actualJava);
     }

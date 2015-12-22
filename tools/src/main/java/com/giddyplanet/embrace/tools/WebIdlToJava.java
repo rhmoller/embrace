@@ -11,6 +11,7 @@ import com.lexicalscope.jewel.cli.Option;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.jsoup.Jsoup;
@@ -111,7 +112,7 @@ public class WebIdlToJava {
     public static void transpile(ModelBuildingListener listener, Reader reader) throws IOException {
         WebIDLLexer lexer = new WebIDLLexer(new ANTLRInputStream(reader));
         WebIDLParser parser = new WebIDLParser(new CommonTokenStream(lexer));
-        parser.setErrorHandler(new BailErrorStrategy());
+        parser.setErrorHandler(new DefaultErrorStrategy());
 
         try {
             WebIDLParser.WebIDLContext webIDL = parser.webIDL();

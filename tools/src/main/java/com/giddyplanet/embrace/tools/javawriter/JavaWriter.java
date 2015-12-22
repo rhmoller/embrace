@@ -1,9 +1,9 @@
 package com.giddyplanet.embrace.tools.javawriter;
 
 import com.giddyplanet.embrace.tools.model.TypeResolver;
+import com.giddyplanet.embrace.tools.model.java.*;
 import com.giddyplanet.embrace.tools.model.webidl.*;
 import com.giddyplanet.embrace.tools.model.webidl.Enumeration;
-import com.giddyplanet.embrace.tools.model.webidl.Exception;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,142 @@ public class JavaWriter {
         return parent;
     }
 
+    public String createSource(JClass jClass) {
+        StringBuilder sb = new StringBuilder();
+        if (javaPackage != null) {
+            sb.append("package ").append(javaPackage).append(";\n");
+            sb.append("\n");
+        }
+
+        if (jClass.isFunctional()) {
+            sb.append("import jsinterop.annotations.JsFunction;\n");
+        }
+        sb.append("import jsinterop.annotations.JsIgnore;\n");
+        sb.append("import jsinterop.annotations.JsOverlay;\n");
+        sb.append("import jsinterop.annotations.JsPackage;\n");
+        sb.append("import jsinterop.annotations.JsProperty;\n");
+        if (!jClass.isFunctional()) {
+            sb.append("import jsinterop.annotations.JsType;\n");
+        }
+        sb.append("\n");
+
+        if (jClass.isFunctional()) {
+            sb.append("@JsFunction\n");
+        } else if (!jClass.isNoInterfaceObject()) {
+            sb.append("@JsType(isNative = true, namespace = JsPackage.GLOBAL)\n");
+        }
+        AbstractionLevel absLvl = jClass.getAbstraction();
+        switch (absLvl) {
+            case INTERFACE: {
+                sb.append("public interface ").append(jClass.getName());
+                LinkedHashSet<String> interfaces = jClass.getInterfaces();
+                writeInterfaces(sb, interfaces, " extends ");
+                sb.append(" {\n");
+                break;
+            }
+            case ABSTRACT_CLASS: {
+                sb.append("public abstract class ").append(jClass.getName());
+                String superTypeName = jClass.getSuperType();
+                if (superTypeName != null) {
+                    sb.append(" extends ").append(superTypeName).append(" ");
+                }
+                LinkedHashSet<String> interfaces = jClass.getInterfaces();
+                writeInterfaces(sb, interfaces, " implements ");
+                sb.append(" {\n");
+                break;
+            }
+            case CLASS: {
+                sb.append("public class ").append(jClass.getName());
+                String superTypeName = jClass.getSuperType();
+                if (superTypeName != null) {
+                    sb.append(" extends ").append(superTypeName).append(" ");
+                }
+                LinkedHashSet<String> interfaces = jClass.getInterfaces();
+                writeInterfaces(sb, interfaces, " implements ");
+                sb.append(" {\n");
+                break;
+            }
+        }
+
+        for (JConstant jConstant : jClass.getConstants()) {
+            switch (absLvl) {
+                case INTERFACE:
+                    if (jClass.isNoInterfaceObject()) {
+                        String type = fixType(jConstant.getType().getName());
+                        sb.append(INDENT).append("public static ").append(type).append(" ").append(jConstant.getName()).append(" = ").append(jConstant.getValue()).append(";\n");
+                    }
+                    break;
+                case ABSTRACT_CLASS:
+                case CLASS:
+                    String type = fixType(jConstant.getType().getName());
+                    sb.append(INDENT).append("public static ").append(type).append(" ").append(jConstant.getName()).append("; // = ").append(jConstant.getValue()).append("\n");
+                    break;
+            }
+        }
+
+        for (JField field : jClass.getFields()) {
+            switch (absLvl) {
+                case INTERFACE:
+                    break;
+                case ABSTRACT_CLASS:
+                case CLASS:
+                    sb.append(INDENT).append("public ").append(field.getType().getName()).append(" ").append(field.getName()).append(";\n");
+                    break;
+            }
+        }
+
+        for (JMethod method : jClass.getConstructors()) {
+            sb.append(INDENT).append(method.getVisibility()).append(" ").append(method.getName()).append("(");
+            writeArguments(sb, method);
+            sb.append(") {}\n");
+        }
+
+        for (JMethod method : jClass.getMethods()) {
+            switch (absLvl) {
+                case INTERFACE:
+                    sb.append(INDENT).append(method.getReturnType().getName()).append(" ").append(method.getName()).append("(");
+                    writeArguments(sb, method);
+                    sb.append(");\n");
+                    break;
+                case ABSTRACT_CLASS:
+                    sb.append(INDENT).append("public ");
+                    if (method.isaStatic()) {
+                        sb.append("static ");
+                    }
+                    sb.append("native ").append(method.getReturnType().getName()).append(" ").append(method.getName()).append("(");
+                    writeArguments(sb, method);
+                    sb.append(");\n");
+                    break;
+                case CLASS:
+                    sb.append(INDENT).append("public ");
+                    if (method.isaStatic()) {
+                        sb.append("static ");
+                    }
+                    sb.append("native ").append(method.getReturnType().getName()).append(" ").append(method.getName()).append("(");
+                    writeArguments(sb, method);
+                    sb.append(");\n");
+                    break;
+            }
+        }
+
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    private void writeInterfaces(StringBuilder sb, LinkedHashSet<String> interfaces, String keyword) {
+        if (!interfaces.isEmpty()) {
+            sb.append(keyword);
+            for (Iterator<String> iterator = interfaces.iterator(); iterator.hasNext(); ) {
+                String anInterface = iterator.next();
+                sb.append(anInterface);
+                if (iterator.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+        }
+    }
+
+
     public void createSourceFile(Definition definition) throws IOException {
         if (definition instanceof Interface) {
             String src = createSource((Interface) definition);
@@ -56,6 +192,12 @@ public class JavaWriter {
             File srcFile = new File(packageFolder, callback.getName() + ".java");
             Files.write(srcFile.toPath(), src.getBytes("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         }
+    }
+
+    public void createSourceFile(JClass definition) throws IOException {
+        String src = createSource(definition);
+        File srcFile = new File(packageFolder, definition.getName() + ".java");
+        Files.write(srcFile.toPath(), src.getBytes("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     private String createSource(Enumeration e) {
@@ -142,9 +284,9 @@ public class JavaWriter {
             }
         }
 
-        Set<String> extendedAttributes = ((Interface) definition).getExtendedAttributes();
+        Set<String> extendedAttributes = definition.getExtendedAttributes();
         long constructorCount = definition.getConstructors().size();
-        Interface superType = ((Interface) definition).getSuperType();
+        Interface superType = definition.getSuperType().getResolved();
 
         boolean isAbstract = false;
         boolean isInterface = false;
@@ -176,9 +318,9 @@ public class JavaWriter {
                 isAbstract = false;
                 isInterface = true;
                 sb.append("public interface ").append(typeName);
-                writeInterfaces((Interface) definition, sb, " extends ");
+                writeInterfaces(definition, sb, " extends ");
                 if (superType != null) {
-                    if (((Interface) definition).getInterfaces().isEmpty()) {
+                    if (definition.getInterfaces().isEmpty()) {
                         sb.append(" extends ");
                     }
                     sb.append(superType.getName());
@@ -284,7 +426,7 @@ public class JavaWriter {
         for (Interface anInterface : interfaces) {
             collectNoInterfaceObjectAttributes(anInterface, attributes);
         }
-        Interface superType = definition.getSuperType();
+        Interface superType = definition.getSuperType().getResolved();
         if (superType != null && superType.getExtendedAttributes().contains("NoInterfaceObject")) {
             collectNoInterfaceObjectAttributes(superType, attributes);
         }
@@ -300,7 +442,7 @@ public class JavaWriter {
             collectAbstractMethods(anInterface, ops);
         }
 
-        Interface superType = definition.getSuperType();
+        Interface superType = definition.getSuperType().getResolved();
         if (superType != null) {
             collectAbstractMethods(superType, ops);
         }
@@ -331,6 +473,22 @@ public class JavaWriter {
                 }
             }
             writeOperation(sb, isInterface, op2);
+        }
+    }
+
+    private void writeArguments(StringBuilder sb, JMethod method) {
+        LinkedList<JArgument> arguments = method.getArguments();
+        for (Iterator<JArgument> iterator = arguments.iterator(); iterator.hasNext(); ) {
+            JArgument argument = iterator.next();
+            sb.append(argument.getType().getName());
+            if (argument.isVarArgs()) {
+                sb.append("...");
+            }
+            sb.append(" ");
+            sb.append(fixName(argument.getName()));
+            if (iterator.hasNext()) {
+                sb.append(", ");
+            }
         }
     }
 
@@ -397,9 +555,12 @@ public class JavaWriter {
             case "short":
             case "unsignedshort":
                 return "short";
+            case "int":
             case "long":
             case "unsignedlong":
                 return "int"; // long-int
+            case "float":
+                return "float";
             case "double":
             case "unrestricteddouble":
                 return "double";

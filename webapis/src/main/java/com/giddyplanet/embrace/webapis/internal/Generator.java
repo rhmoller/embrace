@@ -2,9 +2,13 @@ package com.giddyplanet.embrace.webapis.internal;
 
 import com.giddyplanet.embrace.tools.WebIdlToJava;
 import com.giddyplanet.embrace.tools.javawriter.JavaWriter;
+import com.giddyplanet.embrace.tools.model.java.JClass;
+import com.giddyplanet.embrace.tools.model.java.JavaModel;
 import com.giddyplanet.embrace.tools.model.webidl.Definition;
+import com.giddyplanet.embrace.tools.model.webidl.Model;
 import com.giddyplanet.embrace.tools.model.webidl.SimpleTypeResolver;
 import com.giddyplanet.embrace.tools.webidl2java.ModelBuildingListener;
+import com.giddyplanet.embrace.tools.webidl2java.ModelConverter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,8 +37,13 @@ public class Generator {
         File srcFolder = new File("build/generated-src/java/main");
         srcFolder.mkdirs();
 
-        JavaWriter writer = new JavaWriter(srcFolder, "com.giddyplanet.embrace.webapis", new SimpleTypeResolver(listener.getModel()));
-        for (Definition definition : listener.getModel().getTypes().values()) {
+        Model model = listener.getModel();
+        SimpleTypeResolver resolver = new SimpleTypeResolver(model);
+        ModelConverter converter = new ModelConverter(model, resolver);
+        JavaModel javaModel = converter.bind();
+
+        JavaWriter writer = new JavaWriter(srcFolder, "com.giddyplanet.embrace.webapis", resolver);
+        for (JClass definition : javaModel.getTypes().values()) {
             writer.createSourceFile(definition);
         }
     }

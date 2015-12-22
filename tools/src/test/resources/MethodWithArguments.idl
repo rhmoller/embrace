@@ -1,0 +1,3 @@
+interface MethodWithArguments {
+    int max(int a, int b);
+};

@@ -8,7 +8,7 @@ public class Interface implements Definition {
     LinkedHashSet<Operation> constructors = new LinkedHashSet<>();
     LinkedHashSet<Operation> operations = new LinkedHashSet<>();
     LinkedHashSet<Attribute> attributes = new LinkedHashSet<>();
-    Interface superType;
+    TypeRef superType;
     LinkedHashSet<Interface> interfaces = new LinkedHashSet<>();
     LinkedHashSet<Constant> constants = new LinkedHashSet<>();
     private Set<String> extendedAttributes = new HashSet<>();
@@ -21,7 +21,9 @@ public class Interface implements Definition {
     public String getJavaName() {
         for (String extendedAttribute : extendedAttributes) {
             if (extendedAttribute.startsWith("JavaName=")) {
-                return extendedAttribute.substring(9);
+                String javaName = extendedAttribute.substring(9);
+                System.out.println("JavaName for " + name + " is " + javaName);
+                return javaName;
             }
         }
         return name;
@@ -51,11 +53,11 @@ public class Interface implements Definition {
         return new ArrayList<>(operations);
     }
 
-    public Interface getSuperType() {
+    public TypeRef<Interface> getSuperType() {
         return superType;
     }
 
-    public void setSuperType(Interface superType) {
+    public void setSuperType(TypeRef<Interface> superType) {
         this.superType = superType;
     }
 
