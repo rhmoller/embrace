@@ -155,7 +155,6 @@ public class ModelConverter {
 
             while (arguments.size() > 0 && arguments.get(arguments.size() - 1).isOptional()) {
                 arguments.remove(arguments.size() - 1);
-                System.out.println("Cut one off " + method.getName());
 
                 method = new JMethod(java.getName());
 
@@ -177,7 +176,6 @@ public class ModelConverter {
 
             while (arguments.size() > 0 && arguments.get(arguments.size() - 1).isOptional()) {
                 arguments.remove(arguments.size() - 1);
-                System.out.println("Cut one off " + method.getName());
 
                 method = new JMethod(operation.getName());
                 method.setReturnType(new JTypeRef(fixType(operation.getReturnType(), true))); // todo: test for optional return
@@ -204,7 +202,13 @@ public class ModelConverter {
 
         if (type.startsWith("sequence<")) {
             type = box(fixType(type.substring(9, type.length() - 1), returnValue)) + "[]";
+            return type;
 //            returnType = "java.util.ArrayList<" + box(fixType(returnType.substring(9, returnType.length() - 1))) + ">";
+        }
+
+        if (type.endsWith("[]")) {
+            type = fixType(type.substring(0, type.length() -  2), returnValue) + "[]";
+            return type;
         }
 
         if (type.startsWith("Promise<")) {
@@ -216,10 +220,6 @@ public class ModelConverter {
             if (resolved instanceof Enumeration) {
                 return "String";
             }
-
-            if (resolved instanceof Callback) {
-
-            }
         }
 
         switch (type) {
@@ -230,6 +230,9 @@ public class ModelConverter {
             case "USVString":
             case "ByteString":
                 return "String";
+
+            case "octet":
+                return "byte";
 
             case "short":
             case "unsignedshort":
@@ -246,11 +249,6 @@ public class ModelConverter {
             case "boolean":
                 return "boolean";
 
-            case "ArrayBuffer":
-                return "com.google.gwt.typedarrays.shared.ArrayBuffer";
-            case "ArrayBufferView":
-                return "com.google.gwt.typedarrays.shared.ArrayBufferView";
-
             case "Elements":
                 return "Element[]";
 
@@ -262,27 +260,26 @@ public class ModelConverter {
             case "any":
             case "object":
 
-            case "Uint8ClampedArray":
-            case "EventHandler":
-            case "OnErrorEventHandler":
-            case "OnBeforeUnloadEventHandler":
-            case "FileList":
-            case "MediaProvider":
-            case "MediaStream":
-            case "MediaSource":
-            case "DOMMatrix":
-            case "DOMMatrixInit":
-            case "Function":
-            case "WindowProxy":
-            case "RenderingContext":
-            case "WebGLRenderingContext":
-            case "MutationObserverInit":
-            case "Transferable":
-            case "CanvasImageSource":
-            case "HitRegionOptions":
-            case "ImageBitmapSource":
-            case "Blob": // https://html.spec.whatwg.org/#refsFILEAPI
-            case "File": // https://html.spec.whatwg.org/#refsFILEAPI
+//            case "EventHandler":
+//            case "OnErrorEventHandler":
+//            case "OnBeforeUnloadEventHandler":
+//            case "FileList":
+//            case "MediaProvider":
+//            case "MediaStream":
+//            case "MediaSource":
+//            case "DOMMatrix":
+//            case "DOMMatrixInit":
+//            case "Function":
+//            case "WindowProxy":
+//            case "RenderingContext":
+//            case "WebGLRenderingContext":
+//            case "MutationObserverInit":
+//            case "Transferable":
+//            case "CanvasImageSource":
+//            case "HitRegionOptions":
+//            case "ImageBitmapSource":
+//            case "Blob": // https://html.spec.whatwg.org/#refsFILEAPI
+//            case "File": // https://html.spec.whatwg.org/#refsFILEAPI
                 return "Object";
         }
 
