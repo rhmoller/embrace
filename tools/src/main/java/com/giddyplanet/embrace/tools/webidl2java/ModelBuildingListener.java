@@ -43,10 +43,10 @@ public class ModelBuildingListener extends WebIDLBaseListener {
     @Override
     public void exitExtendedAttributeNoArgs(WebIDLParser.ExtendedAttributeNoArgsContext ctx) {
         super.exitExtendedAttributeNoArgs(ctx);
-        if (currentMethod != null) {
+        if (currentMethod != null && "<init>".equals(currentMethod.getName())) {
             constructors.add((Operation) currentMethod);
+            currentMethod = null;
         }
-        currentMethod = null;
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ModelBuildingListener extends WebIDLBaseListener {
                     // if a getter or setter has an id we can treat it as an operation
 
                     if (id != null) {
-                        String name = id.toString();
+                        String name = id.getText();
                         currentMethod = new Operation(name);
 
                         WebIDLParser.TypeContext type = specialOp.returnType().type();
@@ -168,8 +168,6 @@ public class ModelBuildingListener extends WebIDLBaseListener {
         WebIDLParser.OperationRestContext rest = ctx.operationRest();
         if (rest != null && rest.optionalIdentifier() != null) {
             TerminalNode id = rest.optionalIdentifier().IDENTIFIER_WEBIDL();
-
-            System.out.println("Static method " + id);
 
             String name = id.toString();
             currentMethod = new Operation(name);

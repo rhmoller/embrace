@@ -10,4 +10,6 @@ public interface HasArguments {
     Argument addArgument(String type, String name);
 
     List<Argument> getArguments();
+
+    String getName();
 }
