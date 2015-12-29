@@ -2,10 +2,12 @@ package com.giddyplanet.embrace.examples.client;
 
 import com.giddyplanet.embrace.examples.client.batandball.BouncingBall;
 import com.giddyplanet.embrace.examples.client.canvas.CanvasExample;
+import com.giddyplanet.embrace.examples.client.canvas.CanvasTypedArrayExample;
 import com.giddyplanet.embrace.examples.client.event.EventExample;
 import com.giddyplanet.embrace.examples.client.hello.HelloExample;
 import com.giddyplanet.embrace.examples.client.observable.ObservableExample;
 import com.giddyplanet.embrace.examples.client.timer.TimerExample;
+import com.giddyplanet.embrace.examples.client.util.function.UnaryVoidFunction;
 import com.giddyplanet.embrace.examples.client.websocket.WebSocketExample;
 import com.giddyplanet.embrace.webapis.*;
 import com.google.gwt.core.client.EntryPoint;
@@ -24,6 +26,7 @@ public class Examples implements EntryPoint {
         addExample(new HelloExample());
         addExample(new EventExample());
         addExample(new CanvasExample());
+        addExample(new CanvasTypedArrayExample());
         addExample(new TimerExample());
         addExample(new WebSocketExample());
         addExample(new ObservableExample());
@@ -67,7 +70,9 @@ public class Examples implements EntryPoint {
 
             HTMLElement root = example.setup();
             container.appendChild(root);
-            example.start();
+            getWindow().setTimeout((UnaryVoidFunction) (t) -> {
+                example.start();
+            }, 0);
         }, false);
     }
 
