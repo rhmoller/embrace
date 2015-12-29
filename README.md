@@ -58,6 +58,13 @@ Noticeable missing features in the WebIDL parser
 * numeric types may not get the best suitable Java representation
 * optional primitives are not represented as boxed types in Java
 
+## Notes
+
+* Workaround for unexpected WebIDL constructs in various specs
+** Typed arrays specification states that ArrayBuffer implements Transferable, but Transferable is a typedef - not an interface. 
+** HTMLCollection.namedItem() return type (Node) is not compatible with HTMLFormControlsCollection.namedItem() return type (RadioNodeList or Element)
+
 ## License
 
 This project is released as open source under the MIT License
+

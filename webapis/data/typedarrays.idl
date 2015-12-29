@@ -6,7 +6,7 @@ interface ArrayBuffer {
     ArrayBuffer slice(long begin, optional long end);
     static boolean isView(any value);
 };
-//ArrayBuffer implements Transferable;
+ArrayBuffer implements Transferable;
 [NoInterfaceObject]
 interface ArrayBufferView {
     readonly attribute ArrayBuffer buffer;
