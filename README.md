@@ -61,8 +61,8 @@ Noticeable missing features in the WebIDL parser
 ## Notes
 
 * Workaround for unexpected WebIDL constructs in various specs
-** Typed arrays specification states that ArrayBuffer implements Transferable, but Transferable is a typedef - not an interface. 
-** HTMLCollection.namedItem() return type (Node) is not compatible with HTMLFormControlsCollection.namedItem() return type (RadioNodeList or Element)
+    * Typed arrays specification states that ArrayBuffer implements Transferable, but Transferable is a typedef - not an interface. 
+    * HTMLCollection.namedItem() return type (Node) is not compatible with HTMLFormControlsCollection.namedItem() return type (RadioNodeList or Element)
 
 ## License
 
